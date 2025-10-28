@@ -1,0 +1,7 @@
+FROM postgres:latetst
+
+ENV POSTGRES_USER=docker
+ENV POSTGRES_PASSWORD=docker
+ENV POSTGRES_DB=info_crypto
+
+EXPOSE 5432

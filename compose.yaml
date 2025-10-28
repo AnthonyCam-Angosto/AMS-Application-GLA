@@ -1,0 +1,30 @@
+services:
+  fetchapi:
+    build: ./FetchAPI
+    container_name: fetchapi
+    networks:
+     - ams_network
+  
+  db:
+    build: ./db
+    container_name: db
+    #volumes:
+    #  - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: info_crypto
+    networks:
+      - ams_network
+
+  ServeurWeb:
+    build: ./ServeurWeb
+    container_name: serveurweb
+    ports:
+      - "8080:80"
+    networks:
+      - ams_network
+  
+networks:
+  ams_network:
+    driver: bridge
