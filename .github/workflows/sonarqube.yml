@@ -7,20 +7,35 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   python-sonarqube:
-    name: python-sonarqube
+    name: analyse python
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FetchAPI/app
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: >
+            -Dsonar.projectBaseDir=FetchAPI/app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   
   java-sonarqube:
-    name: Build and analyze
+    name: java analysis
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ServeurWeb/app
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +44,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'zulu' # Alternative distribution options are available.
+          distribution: 'zulu'
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
@@ -42,8 +57,12 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.projectBaseDir=ServeurWeb/app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        working-directory: ServeurWeb/app
-        run: mvn -B verify -Ptest org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=AnthonyCam-Angosto_AMS-Application-GLA
