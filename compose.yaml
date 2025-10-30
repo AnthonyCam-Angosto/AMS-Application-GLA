@@ -1,6 +1,7 @@
 services:
   fetchapi:
     build: ./FetchAPI
+    image: fetchapi
     container_name: fetchapi
     networks:
      - ams_network
@@ -18,7 +19,10 @@ services:
       - ams_network
 
   ServeurWeb:
-    build: ./ServeurWeb
+    build: 
+      context: ./ServeurWeb
+      dockerfile: Dockerfile
+    image: serveurweb
     container_name: serveurweb
     ports:
       - "8080:80"
