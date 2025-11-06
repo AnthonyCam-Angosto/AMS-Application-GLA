@@ -3,6 +3,8 @@ services:
     build: ./FetchAPI
     image: fetchapi
     container_name: fetchapi
+    environment:
+      POSTGRES_PASSWORD: docker
     networks:
      - ams_network
   
