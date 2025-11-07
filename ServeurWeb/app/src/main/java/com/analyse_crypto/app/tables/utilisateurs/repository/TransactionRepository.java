@@ -10,5 +10,4 @@ import com.analyse_crypto.app.tables.utilisateurs.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByCompte(Compte compte);
-    List<Transaction> findByType(TypeTransac type);
 }

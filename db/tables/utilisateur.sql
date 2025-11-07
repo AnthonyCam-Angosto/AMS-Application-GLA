@@ -1,5 +1,5 @@
-CREATE TYPE role_user AS ENUM ('admin', 'utilisateur');
-CREATE TYPE type_transac AS ENUM ('entree', 'sortie');
+CREATE TYPE role_user AS ENUM ('ADMIN', 'UTILISATEUR');
+CREATE TYPE type_transac AS ENUM ('ENTREE', 'SORTIE');
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,

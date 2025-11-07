@@ -1,0 +1,50 @@
+h1 {
+    text-align: center;
+    margin-top: 10px;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column; /* Organise les éléments en colonne */
+    align-items: center; /* Centre les éléments horizontalement */
+    justify-content: center; /* Centre les éléments verticalement */
+    text-align: center;
+    width: 50%;
+    height: 50%;
+    background-color: white;
+    position: fixed;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.295) 2px 2px 03px 0px;
+}
+
+.connectionItems input {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: lightgray;
+    margin-bottom: 10px;
+}
+
+.connection-button input {
+    padding: 10px;
+    border-radius: 20px;
+    background-color: black;
+    color: white;
+}
+
+.connectionError {
+    text-align: center;
+    color:red;
+}
+
+.deconnexion {
+    text-align: center;
+}

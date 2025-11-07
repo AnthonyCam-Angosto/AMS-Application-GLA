@@ -10,5 +10,4 @@ import com.analyse_crypto.app.tables.utilisateurs.Portefeuille;
 
 public interface CompteRepository extends JpaRepository<Compte, Long> {
     List<Compte> findByPortefeuille(Portefeuille portefeuille);
-    List<Compte> findByCrypto(Crypto crypto);
 }
