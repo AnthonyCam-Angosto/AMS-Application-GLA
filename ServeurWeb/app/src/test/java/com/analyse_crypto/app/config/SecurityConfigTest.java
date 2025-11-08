@@ -24,7 +24,7 @@ public class SecurityConfigTest {
 
     @Test
     void authentification() throws Exception {
-        mockMvc.perform(get("/profiles"))
+        mockMvc.perform(get("/profile"))
                .andExpect(status().is3xxRedirection());
     }
 

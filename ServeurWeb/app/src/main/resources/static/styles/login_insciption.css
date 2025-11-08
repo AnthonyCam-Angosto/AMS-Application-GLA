@@ -1,0 +1,77 @@
+/* Styles généraux déjà présents... */
+
+/* Page login */
+.container {
+  max-width: 400px;
+  margin: 80px auto;
+  background: #121829;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+.container h1 {
+  margin-bottom: 20px;
+  color: #6ee7f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ccc;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background: #0b0f1a;
+  color: #f0f0f0;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  background: #6ee7f9;
+  color: #0b0f1a;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.register-link {
+  margin-top: 15px;
+  color: #aaa;
+}
+.register-link a {
+  color: #6ee7f9;
+  text-decoration: none;
+}
+
+/* Spans d’erreur */
+.error {
+  display: block;
+  margin-top: 8px;
+  color: #ef4444;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.logout {
+  display: block;
+  margin-bottom: 15px;
+  color: #22c55e; /* vert pour succès */
+  font-weight: bold;
+}

@@ -21,11 +21,12 @@ public class DataInitializer {
 
     @Bean
     CommandLineRunner initAdmin() {
+        String name="admin";
         return args -> {
-            if (repo.findByIdentifiant("admin").isEmpty()) {
+            if (repo.findByIdentifiant(name).isEmpty()) {
                 User admin = new User();
-                admin.setIdentifiant("admin");
-                admin.setPassword(encoder.encode("admin"));
+                admin.setIdentifiant(name);
+                admin.setPassword(encoder.encode(name));
                 admin.setRole(RoleUser.ADMIN);
                 admin.setEmail("test@google.com");
                 repo.save(admin);

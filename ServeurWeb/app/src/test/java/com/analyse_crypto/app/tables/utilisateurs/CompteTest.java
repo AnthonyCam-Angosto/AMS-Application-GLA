@@ -1,12 +1,11 @@
 package com.analyse_crypto.app.tables.utilisateurs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ public class CompteTest {
         userRepository.deleteAll();
 
 
-        User user= new User("test", "test@google.com", "test", RoleUser.UTILISATEUR);
+        user= new User("test", "test@google.com", "test", RoleUser.UTILISATEUR);
         userRepository.save(user);
         portefeuille= new Portefeuille(user, "exemple", date);
         portefeuilleRepository.save(portefeuille);
@@ -57,13 +56,15 @@ public class CompteTest {
 
     @Test
     void testCompte(){
-        Compte compte= new Compte(portefeuille, crypto, new BigDecimal(10));
+        BigDecimal val=new BigDecimal(10);
+        Compte compte= new Compte(portefeuille, crypto, val);
         Compte saved = repo.save(compte);
 
         assertNotNull(saved.getIdCompte());
         assertEquals(repo.count(), 1);
         assertEquals(saved.getPortefeuille(),portefeuille);
         assertEquals(saved.getCrypto(),crypto);
+        assertEquals(saved.getSolde(),val);
     }
 
     @Test

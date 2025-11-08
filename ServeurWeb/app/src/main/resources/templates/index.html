@@ -1,12 +1,69 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
-    <head>
-        <meta charset = "UTF-8">
-        <title>Analyse Crypto</title>
-        <link th:href="@{/styles/style.css}" href="../static/styles/style.css" rel="stylesheet">
-    </head>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>CryptoView - Accueil</title>
+  <link th:href="@{/styles/style.css}" href="../static/styles/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script th:src="@{/js/index.js}" src="../static/js/index.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo">CryptoView</div>
+    <nav>
+      <a th:href="@{/}">Accueil</a>
+      <a th:href="@{/dashboard}">Tableaux de bord</a>
+      <a th:href="@{/portfolio}">Portefeuille</a>
+      <a th:href="@{/alerts}">Alertes</a>
+      <a th:href="@{/forecast}">Prévisions</a>
 
-    <body>
-        <h1>Analyse Crypto</h1>
-    </body>
+      <span sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Connexion</a>
+        <a th:href="@{/inscription}">Inscription</a>
+      </span>
+
+      <span sec:authorize="isAuthenticated()">
+        <a th:href="@{/profile}"><span sec:authentication="name"></span></a> |
+        <a th:href="@{/logout}">Déconnexion</a>
+      </span>
+
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Analysez, visualisez et simulez vos investissements crypto</h1>
+    <p>Application interactive pour suivre les marchés et tester vos stratégies.</p>
+    <div class="cta">
+      <span sec:authorize="isAnonymous()">
+      <a th:href="@{/inscription}" class="btn">Créer un compte</a>
+      <a th:href="@{/demo}" class="btn btn-secondary">Découvrir la démo</a>
+      </span>
+      <span sec:authorize="isAuthenticated()">
+        <a th:href="@{/dashboard}" class="btn">Accéder à mon tableau de bord</a>
+      </span>
+    </div>
+  </section>
+
+  <section class="chart-section">
+    <h2>Aperçu du marché</h2>
+    <canvas id="cryptoChart"></canvas>
+  </section>
+
+  <section class="features">
+    <h2>Fonctionnalités principales</h2>
+    <div class="grid">
+      <div class="card"><h3>Visualisations dynamiques</h3><p>Graphiques et indicateurs techniques.</p></div>
+      <div class="card"><h3>Filtres avancés</h3><p>Plages temporelles et comparaison multi-actifs.</p></div>
+      <div class="card"><h3>Alertes & notifications</h3><p>Seuils de prix, e-mail, Discord/API.</p></div>
+      <div class="card"><h3>Prévisions</h3><p>Moyennes mobiles, régression linéaire.</p></div>
+      <div class="card"><h3>Portefeuille virtuel</h3><p>Simulez vos achats/ventes.</p></div>
+      <div class="card"><h3>Sécurité & rôles</h3><p>JWT, OAuth2, gestion des rôles.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 CryptoView — Tous droits réservés</p>
+    <p><a th:href="@{/legal}">Mentions légales</a> | <a th:href="@{/privacy}">Confidentialité</a> | <a th:href="@{/support}">Support</a></p>
+  </footer>
+
 </html>

@@ -45,6 +45,7 @@ public class PortefeuilleTest {
         assertEquals(repo.count(), 1);
         assertEquals(saved.getUser(),user);
         assertEquals(saved.getNom(),"exemple");
+        assertEquals(saved.getDateCreation(),date);
     }
 
     @Test

@@ -40,7 +40,7 @@ public class CustomUserDetailsServiceTest {
         assertEquals("user", userDetails.getUsername());
         assertEquals("user", userDetails.getPassword());
         assertTrue(userDetails.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_UTILISATEUR")));
+                .anyMatch(auth -> auth.getAuthority().equals("UTILISATEUR")));
         
     }
 

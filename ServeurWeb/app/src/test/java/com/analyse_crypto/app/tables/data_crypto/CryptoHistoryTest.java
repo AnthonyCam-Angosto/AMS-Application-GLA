@@ -6,7 +6,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,10 @@ public class CryptoHistoryTest {
         assertEquals(repo.count(), 1);
         assertEquals(saved.getCrypto(), crypto);
         assertEquals(saved.getHighPrice(),BigDecimal.valueOf(123.45));
+        assertEquals(saved.getClosePrice(),BigDecimal.valueOf(123.45));
+        assertEquals(saved.getLowPrice(),BigDecimal.valueOf(123.45));
+        assertEquals(saved.getOpenPrice(),BigDecimal.valueOf(123.45));
+        assertEquals(saved.getDateTime(),date);
     }
 
     @Test

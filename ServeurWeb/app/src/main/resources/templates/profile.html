@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"></html>>
+    <head>
+        <meta charset = "UTF-8">
+        <title>Profil - CryptoView</title>
+        <link th:href="@{/styles/style.css}"  href="../static/styles/style.css" rel="stylesheet">
+        <link th:href="@{/styles/profile.css}"  href="../static/styles/profile.css" rel="stylesheet">
+        <script th:src="@{/js/profile.js}" src="../static/js/profile.js" defer></script>
+    </head>
+
+    <body>
+        <div class="profile-container">
+            <h1>Mon profil</h1>
+
+            <div class="profile-card">
+                <p><strong>Identifiant :</strong> <span sec:authentication="name"></span></p>
+                <p><strong>Email :</strong> <span sec:authentication="principal.email"></span></p>
+            </div>
+
+            <div class="profile-actions">
+                <a th:href="@{/}" class="btn btn-home">🏠 Accueil</a>
+                <button type="button" class="btn btn-primary" onclick="openModal('emailModal')">📧 Changer email</button>
+                <button type="button" class="btn btn-secondary" onclick="openModal('passwordModal')">🔑 Changer mot de passe</button>
+                <a th:href="@{/logout}" class="btn btn-danger">🚪 Déconnexion</a>
+            </div>
+
+        </div>
+        
+
+        <!-- Popup Email -->
+        <div id="emailModal" class="modal">
+            <div class="modal-content">
+            <span class="close" onclick="closeModal('emailModal')">&times;</span>
+            <h2>Modifier mon email</h2>
+            <form th:action="@{/profile/change-email}" th:object="${EmailChangeForm}" method="post">
+                <div class="form-group">
+                <label for="newEmail">Nouvel email</label>
+                <input type="email" th:field="*{newEmail}" id="newEmail" name="newEmail" required>
+                <span class="error" th:if="${#fields.hasErrors('newEmail')}" th:errors="*{newEmail}"></span>
+                </div>
+                <button type="submit" class="btn">Enregistrer</button>
+            </form>
+            </div>
+        </div>
+
+        <!-- Popup Mot de passe -->
+        <div id="passwordModal" class="modal">
+            <div class="modal-content">
+            <span class="close" onclick="closeModal('PasswordModal')">&times;</span>
+            <h2>Modifier mon mot de passe</h2>
+            <form th:action="@{/profile/change-password}" th:object="${PasswordChangeForm}" method="post">
+                <div class="form-group">
+                <label for="oldPassword">Ancien mot de passe</label>
+                <input type="password" id="oldPassword" th:field="*{oldPassword}" name="oldPassword" required>
+                <span class="error" th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}"></span>
+                </div>
+                <div class="form-group">
+                <label for="newPassword">Nouveau mot de passe</label>
+                <input type="password" id="newPassword" th:field="*{newPassword}" name="newPassword" required>
+                <span class="error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></span>
+                </div>
+                <button type="submit" class="btn">Enregistrer</button>
+            </form>
+            </div>
+        </div>
+    </body>
+</html>

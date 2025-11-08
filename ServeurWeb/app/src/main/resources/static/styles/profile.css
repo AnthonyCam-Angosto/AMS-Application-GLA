@@ -1,0 +1,96 @@
+.profile-container {
+  max-width: 600px;
+  margin: 80px auto;
+  background: #121829;
+  padding: 30px;
+  border-radius: 8px;
+  color: #f0f0f0;
+}
+
+.profile-card p {
+  margin: 10px 0;
+}
+
+.modal {
+  display: none; /* cachée par défaut */
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background: #121829;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  color: #f0f0f0;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+}
+.close:hover { color: #fff; }
+
+.profile-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center; /* centre horizontalement */
+  flex-wrap: wrap;         /* passe à la ligne si trop serré */
+  gap: 15px;               /* espace entre les boutons */
+}
+
+.btn {
+  display: inline-block;
+  min-width: 160px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Palette cohérente */
+.btn-home {
+  background: #38bdf8;
+  color: #0b0f1a;
+}
+.btn-home:hover {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.btn-primary {
+  background: #6ee7f9;
+  color: #0b0f1a;
+}
+.btn-primary:hover {
+  background: #22d3ee;
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #7c3aed;
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #6d28d9;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #dc2626;
+}

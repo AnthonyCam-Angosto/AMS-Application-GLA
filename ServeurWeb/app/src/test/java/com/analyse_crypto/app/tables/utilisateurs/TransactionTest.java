@@ -1,12 +1,11 @@
 package com.analyse_crypto.app.tables.utilisateurs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class TransactionTest {
         userRepository.deleteAll();
 
 
-        User user= new User("test", "test@google.com", "test", RoleUser.UTILISATEUR);
+        user= new User("test", "test@google.com", "test", RoleUser.UTILISATEUR);
         userRepository.save(user);
         portefeuille= new Portefeuille(user, "exemple", date);
         portefeuilleRepository.save(portefeuille);
@@ -67,13 +66,16 @@ public class TransactionTest {
 
     @Test
     void testTransaction(){
-        Transaction transaction= new Transaction(compte, TypeTransac.ENTREE, new BigDecimal(10), date);
+        BigDecimal val=new BigDecimal(10);
+        Transaction transaction= new Transaction(compte, TypeTransac.ENTREE,val, date);
         Transaction saved = repo.save(transaction);
 
         assertNotNull(saved.getIdTransaction());
         assertEquals(repo.count(), 1);
         assertEquals(saved.getCompte(),compte);
         assertEquals(saved.getType(),TypeTransac.ENTREE);
+        assertEquals(saved.getDateTransaction(),date);
+        assertEquals(saved.getMontant(),val);
     }
 
     @Test

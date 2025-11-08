@@ -2,47 +2,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
         <meta charset = "UTF-8">
-        <title>Analyse Crypto</title>
-        <link th:href="@{/styles/style.css}" href="../static/styles/style.css" rel="stylesheet">
-        <link th:href="@{/styles/styleLogin.css}"  href="../static/styles/styleLogin.css" rel="stylesheet">
+        <title>Connexion</title>
+        <link th:href="@{/styles/style.css}"  href="../static/styles/style.css" rel="stylesheet">
+        <link th:href="@{/styles/login_insciption.css}"  href="../static/styles/login_insciption.css" rel="stylesheet">
     </head>
 
     <body>
-        <!-- Titre principal -->
-        <h1>Analyse Crypto</h1>
+        <div class="container">
+            <h1>Connexion</h2>
 
-        <!-- Message d'erreur en cas d'échec de la connexion -->
-        <div class="connectionError" th:if="${param.error}">
-            <h2>Connexion impossible</h2>
-            <p>Votre login ou mot de passe est erroné</p>
-        </div>
-        <!-- Message de déconnexion réussie -->
-        <div class="deconnexion" th:if="${param.logout}">
-            <p>Vous avez été correctement déconnecté</p>
-        </div>
-        <!-- Titre de connexion -->
-        <h2 th:unless="${param.error} or ${param.logout}">Connectez-vous</h2>
+            <span th:if="${errorMsg}" class="error" th:text="${errorMsg}"></span>
+            <span th:if="${logoutMsg}" class="logout" th:text="${logoutMsg}"></span>
 
-        <!-- Formulaire de connexion -->
-        <div class="login-container">
             <form th:action="@{/login}" method="post">
-                <!-- Champ pour le login -->
-                <div class="connectionItems">
-                    <label>Login</label>
-                    <br>
-                    <input type="text" name="username"/>
+                <div class="form-group">
+                    <label for="username">Nom d’utilisateur</label>
+                    <input type="text" id="username" name="username" required />
                 </div>
-                <!-- Champ pour le mot de passe -->
-                <div class="connectionItems">
-                    <label>Mot de passe</label>
-                    <br>
-                    <input type="password" name="password"/>
+
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required />
                 </div>
-                <!-- Bouton de soumission du formulaire de connexion -->
-                <div class="connection-button">
-                    <input type="submit" value="Se connecter"/>
-                </div>
+
+                <button type="submit" class="btn">Se connecter</button>
             </form>
+
+            <p class="register-link">
+                Pas encore de compte ? <a th:href="@{/inscription}">Inscrivez-vous</a>
+            </p>
         </div>
+    
     </body>
 </html>

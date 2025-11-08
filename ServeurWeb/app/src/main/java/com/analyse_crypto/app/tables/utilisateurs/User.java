@@ -11,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(
@@ -29,10 +31,12 @@ public class User {
     @Column(name = "identifiant", nullable = false, length = 50)
     private String identifiant;
 
+    @Email(message="Format d'email invalide")
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
     @Column(name = "password", nullable = false, length = 255)
+    //@Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères.")
     private String password;
 
     @Enumerated(EnumType.STRING)
