@@ -13,10 +13,6 @@ services:
     container_name: db
     volumes:
       - ./db/data:/var/lib/postgresql
-    environment:
-      POSTGRES_USER: docker
-      POSTGRES_PASSWORD: docker
-      POSTGRES_DB: info_crypto
     networks:
       - ams_network
     ports:
