@@ -50,11 +50,25 @@ def update_oldcrypto(crypto:tuple,date:datetime):
     ecriture.add_all_oldcrypto_history(crypto[1],ohlc)
 
 
+def arrondir_jours(valeur: int) -> int:
+    # valeurs acceptées par l'API
+    valeurs_valides = [1, 7, 14, 30, 90, 180, 365]
+    
+    if valeur >= max(valeurs_valides):
+        return max(valeurs_valides)
+    
+    for v in valeurs_valides:
+        if v >= valeur:
+            return v
+    return max(valeurs_valides)
+
+
 def update_crypto_days(crypto:tuple,range=7):
     name_crypto=create_name(crypto)
     url = f"https://api.coingecko.com/api/v3/coins/{name_crypto}/ohlc"
+    range=arrondir_jours(range)
 
-    params = {"vs_currency": "eur", "days": range.__str__(),"x_cg_demo_api_key":api_key}
+    params = {"vs_currency": "eur", "days": range,"x_cg_demo_api_key":api_key}
     response = requests.get(url,params=params)
     if response.status_code!=200:
         print(response,response.json())

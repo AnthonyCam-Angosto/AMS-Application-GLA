@@ -24,6 +24,7 @@ public class WebSecurityConfig {
 
         requests.requestMatchers("/admin/menu").hasRole("ADMIN");
         requests.requestMatchers("/styles/**","/inscription","/","/js/**").permitAll();
+        requests.requestMatchers("/dashboard","/dashboard/**").permitAll();
         requests.anyRequest().authenticated();
         
         })
