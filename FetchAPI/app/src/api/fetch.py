@@ -50,7 +50,7 @@ def update_oldcrypto(crypto:tuple,date:datetime):
     ecriture.add_all_oldcrypto_history(crypto[1],ohlc)
 
 
-def update_crypto_days(crypto:tuple,date:datetime,range=7):
+def update_crypto_days(crypto:tuple,range=7):
     name_crypto=create_name(crypto)
     url = f"https://api.coingecko.com/api/v3/coins/{name_crypto}/ohlc"
 
@@ -63,7 +63,7 @@ def update_crypto_days(crypto:tuple,date:datetime,range=7):
     ecriture.add_all_crypto_history(crypto[1],data)
 
 
-def update_crypto_min(crypto:tuple,date:datetime):
+def update_crypto_min(crypto:tuple):
     name_crypto=create_name(crypto)
     url = f"https://api.coingecko.com/api/v3/coins/{name_crypto}/ohlc"
 

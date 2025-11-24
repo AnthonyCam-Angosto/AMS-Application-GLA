@@ -36,7 +36,7 @@ public class CompteTest {
     private User user;
     private Portefeuille portefeuille;
     private Crypto crypto;
-    private LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
+    private final LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
 
     @BeforeEach
     void setUp() {
@@ -65,6 +65,18 @@ public class CompteTest {
         assertEquals(saved.getPortefeuille(),portefeuille);
         assertEquals(saved.getCrypto(),crypto);
         assertEquals(saved.getSolde(),val);
+
+        saved.setIdCompte(Long.valueOf("5"));
+        assertEquals(saved.getIdCompte(),Long.valueOf("5"));
+        Portefeuille temp_portefeuille= new Portefeuille(user, "test", date);
+        saved.setPortefeuille(temp_portefeuille);
+        assertEquals(saved.getPortefeuille(),temp_portefeuille);
+        Crypto temp_crypto= new Crypto("ETC","etherum");
+        saved.setCrypto(temp_crypto);
+        assertEquals(saved.getCrypto(),temp_crypto);
+        BigDecimal temp_val=new BigDecimal(5);
+        saved.setSolde(temp_val);
+        assertEquals(saved.getSolde(),temp_val);
     }
 
     @Test

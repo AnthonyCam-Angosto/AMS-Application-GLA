@@ -30,7 +30,6 @@ public class DataInitializer {
                 admin.setRole(RoleUser.ADMIN);
                 admin.setEmail("test@google.com");
                 repo.save(admin);
-                System.out.println("Compte admin créé");
             }
         };
     }

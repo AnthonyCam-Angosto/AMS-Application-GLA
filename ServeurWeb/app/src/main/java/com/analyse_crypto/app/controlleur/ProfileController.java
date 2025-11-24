@@ -26,6 +26,10 @@ public class ProfileController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final String emailChangeForm="EmailChangeForm";
+    private final String passwordChangeForm="PasswordChangeForm";
+    private final String page="profile";
+
     public class EmailChangeForm {
         @NotBlank(message = "L’email est requis.")
         @Email(message = "Format d’email invalide.")
@@ -59,20 +63,20 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public String showProfile(Model model) {
-        model.addAttribute("EmailChangeForm", new EmailChangeForm());
-        model.addAttribute("PasswordChangeForm", new PasswordChangeForm());
-        return "profile";
+        model.addAttribute(emailChangeForm, new EmailChangeForm());
+        model.addAttribute(passwordChangeForm, new PasswordChangeForm());
+        return page;
     }
 
 
 
     @PostMapping("/profile/change-email")
-    public String change_email(@Valid @ModelAttribute("EmailChangeForm") EmailChangeForm form,BindingResult result,Authentication authentication,Model model){
+    public String changeEmail(@Valid @ModelAttribute("EmailChangeForm") EmailChangeForm form,BindingResult result,Authentication authentication,Model model){
         if (result.hasErrors()) {
             result.rejectValue("newEmail", "email.format", "erreur format");
-            model.addAttribute("EmailChangeForm", form);
-            model.addAttribute("PasswordChangeForm", new PasswordChangeForm());
-            return "profile";
+            model.addAttribute(emailChangeForm, form);
+            model.addAttribute(passwordChangeForm, new PasswordChangeForm());
+            return page;
         }
 
         String username = authentication.getName();
@@ -80,28 +84,28 @@ public class ProfileController {
 
         if(userRepository.existsByEmail(form.getNewEmail())){
             result.rejectValue("newEmail", "email.exists", "Cet email est déjà utilisé.");
-            model.addAttribute("EmailChangeForm", form);
-            model.addAttribute("PasswordChangeForm", new PasswordChangeForm());
-            return "profile";
+            model.addAttribute(emailChangeForm, form);
+            model.addAttribute(passwordChangeForm, new PasswordChangeForm());
+            return page;
         }
 
         user.setEmail(form.getNewEmail());
         userRepository.save(user);
 
         model.addAttribute("successMsg", "Email mis à jour avec succès.");
-        model.addAttribute("EmailChangeForm", new EmailChangeForm());
-        model.addAttribute("PasswordChangeForm", new PasswordChangeForm());
-        return "profile";
+        model.addAttribute(emailChangeForm, new EmailChangeForm());
+        model.addAttribute(passwordChangeForm, new PasswordChangeForm());
+        return page;
     }
 
     @PostMapping("/profile/change-password")
-    public String change_password( @Valid @ModelAttribute("PasswordChangeForm") PasswordChangeForm form,BindingResult bindingResult,Authentication authentication,Model model){
+    public String changePassword( @Valid @ModelAttribute("PasswordChangeForm") PasswordChangeForm form,BindingResult bindingResult,Authentication authentication,Model model){
         
         if (bindingResult.hasErrors()) {
             bindingResult.rejectValue("oldPassword", "format.oldPassword", "erreur format");
-            model.addAttribute("PasswordChangeForm", form);
-            model.addAttribute("EmailChangeForm", new EmailChangeForm());
-            return "profile";
+            model.addAttribute(passwordChangeForm, form);
+            model.addAttribute(emailChangeForm, new EmailChangeForm());
+            return page;
         }
 
         String username = authentication.getName();
@@ -109,18 +113,18 @@ public class ProfileController {
 
         if (!passwordEncoder.matches(form.getOldPassword(), user.getPassword())) {
             bindingResult.rejectValue("oldPassword", "invalid.oldPassword", "Ancien mot de passe incorrect.");
-            model.addAttribute("passwordChangeForm", form);
-            model.addAttribute("EmailChangeForm", new EmailChangeForm());
-            return "profile";
+            model.addAttribute(passwordChangeForm, form);
+            model.addAttribute(emailChangeForm, new EmailChangeForm());
+            return page;
         }
 
         user.setPassword(passwordEncoder.encode(form.getNewPassword()));
         userRepository.save(user);
 
         model.addAttribute("successMsg", "Mot de passe mis à jour avec succès.");
-        model.addAttribute("EmailChangeForm", new EmailChangeForm());
-        model.addAttribute("PasswordChangeForm", new PasswordChangeForm());
-        return "profile";
+        model.addAttribute(emailChangeForm, new EmailChangeForm());
+        model.addAttribute(passwordChangeForm, new PasswordChangeForm());
+        return page;
     }
     
 }

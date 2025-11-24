@@ -23,7 +23,8 @@ public class CryptoHistoryTest {
     private CryptoRepository cryptoRepository;
 
     private Crypto crypto;
-    private LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
+    private final LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
+    private final BigDecimal val=BigDecimal.valueOf(123.45);
 
     @BeforeEach
     void setUp() {
@@ -37,22 +38,41 @@ public class CryptoHistoryTest {
 
     @Test
     void testBDCrypto() {
-        CryptoHistory cryptohisto=new CryptoHistory(crypto,date,BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45));
+        CryptoHistory cryptohisto=new CryptoHistory(crypto,date,val,val,val,val,val);
         CryptoHistory saved = repo.save(cryptohisto);
+        saved.setVolume(val);
+        saved=repo.save(saved);
 
         assertNotNull(saved.getId());
         assertEquals(repo.count(), 1);
         assertEquals(saved.getCrypto(), crypto);
-        assertEquals(saved.getHighPrice(),BigDecimal.valueOf(123.45));
-        assertEquals(saved.getClosePrice(),BigDecimal.valueOf(123.45));
-        assertEquals(saved.getLowPrice(),BigDecimal.valueOf(123.45));
-        assertEquals(saved.getOpenPrice(),BigDecimal.valueOf(123.45));
+        assertEquals(saved.getHighPrice(),val);
+        assertEquals(saved.getClosePrice(),val);
+        assertEquals(saved.getLowPrice(),val);
+        assertEquals(saved.getOpenPrice(),val);
         assertEquals(saved.getDateTime(),date);
+        assertEquals(saved.getVolume(),val);
+
+        saved.setId(Long.valueOf("5"));
+        assertEquals(saved.getId(),Long.valueOf("5"));
+        LocalDateTime temp_date=LocalDateTime.of(2024, 11, 1, 10, 15);
+        saved.setDateTime(temp_date);
+        assertEquals(saved.getDateTime(),temp_date);
+
+        BigDecimal temp_val=BigDecimal.valueOf(100.45);
+        saved.setHighPrice(temp_val);
+        assertEquals(saved.getHighPrice(),temp_val);
+        saved.setClosePrice(temp_val);
+        assertEquals(saved.getClosePrice(),temp_val);
+        saved.setLowPrice(temp_val);
+        assertEquals(saved.getLowPrice(),temp_val);
+        saved.setOpenPrice(temp_val);
+        assertEquals(saved.getOpenPrice(),temp_val);
     }
 
     @Test
     void testfind(){
-        CryptoHistory cryptohisto=new CryptoHistory(crypto,date,BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45),BigDecimal.valueOf(123.45));
+        CryptoHistory cryptohisto=new CryptoHistory(crypto,date,val,val,val,val,val);
         repo.save(cryptohisto);
 
         List<CryptoHistory> result=repo.findByCrypto(crypto);

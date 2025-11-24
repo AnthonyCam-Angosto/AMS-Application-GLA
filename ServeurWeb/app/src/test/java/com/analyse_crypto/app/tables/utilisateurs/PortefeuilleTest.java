@@ -25,7 +25,7 @@ public class PortefeuilleTest {
     private UserRepository userRepository;
 
     private User user;
-    private LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
+    private final LocalDateTime date=LocalDateTime.of(2025, 11, 1, 10, 15);
 
     @BeforeEach
     void setUp() {
@@ -46,6 +46,17 @@ public class PortefeuilleTest {
         assertEquals(saved.getUser(),user);
         assertEquals(saved.getNom(),"exemple");
         assertEquals(saved.getDateCreation(),date);
+
+        saved.setIdPortefeuille(Long.valueOf("5"));
+        assertEquals(saved.getIdPortefeuille(),Long.valueOf("5"));
+        User temp_user= new User("test2", "test@google.com", "test", RoleUser.UTILISATEUR);
+        saved.setUser(temp_user);
+        assertEquals(saved.getUser(),temp_user);
+        saved.setNom("test");
+        assertEquals(saved.getNom(),"test");
+        LocalDateTime temp_date=LocalDateTime.of(2024, 11, 1, 10, 15);
+        saved.setDateCreation(temp_date);
+        assertEquals(saved.getDateCreation(),temp_date);
     }
 
     @Test

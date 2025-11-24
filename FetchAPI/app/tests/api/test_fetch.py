@@ -68,7 +68,7 @@ def test_update_crypto_days(mock_add,mock_get):
     mock_get.return_value = fake_response
 
     date=datetime(2025,11,18)
-    update_crypto_days(("Bitcoin",1),date)
+    update_crypto_days(("Bitcoin",1))
 
     mock_get.assert_called_once()
     args, kwargs = mock_get.call_args
@@ -89,7 +89,7 @@ def test_update_crypto_min(mock_add,mock_get):
     mock_get.return_value = fake_response
 
     date=datetime(2025,11,18)
-    update_crypto_min(("Bitcoin",1),date)
+    update_crypto_min(("Bitcoin",1))
 
     mock_add.assert_called_once()
     call_args = mock_add.call_args[0]

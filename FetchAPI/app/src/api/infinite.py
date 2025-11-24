@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from time import sleep
 from src.api import fetch
-from src.db.lecture import *
+from src.db.lecture import dernier_date
 
 def old(cryptos:list[tuple]):
     current_date=datetime.now()
@@ -11,11 +11,11 @@ def old(cryptos:list[tuple]):
 
         if(date==None):
             fetch.update_oldcrypto(crypto,current_date-timedelta(weeks=1))
-            fetch.update_crypto_days(crypto,current_date)
+            fetch.update_crypto_days(crypto)
 
         elif(current_date.date()>date.date()):
             diff=current_date-date
-            fetch.update_crypto_days(crypto,current_date,diff.days)
+            fetch.update_crypto_days(crypto,diff.days)
         sleep(1.5)
 
 
@@ -26,4 +26,4 @@ def main_loop(cryptos:list[tuple]):
         sleep(time_sleep)
         current_date=datetime.now()
         for crypto in cryptos:
-            fetch.update_crypto_min(crypto,current_date)
+            fetch.update_crypto_min(crypto)
