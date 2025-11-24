@@ -73,7 +73,7 @@ def test_update_crypto_days(mock_add,mock_get):
     mock_get.assert_called_once()
     args, kwargs = mock_get.call_args
     assert "bitcoin" in args[0]
-    assert kwargs["params"]["days"] =="7"
+    assert kwargs["params"]["days"] ==7
 
     mock_add.assert_called_once()
     call_args = mock_add.call_args[0]

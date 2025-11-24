@@ -1,0 +1,127 @@
+/* Section des contrôles */
+.controls {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: transparent;
+  border-radius: 8px;
+}
+
+.controls .grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.controls .card {
+  flex: 1;
+  min-width: 250px;
+  background: #121829; /* same as site cards */
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(2,6,23,0.6);
+  color: #f0f0f0;
+}
+
+.controls h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #6ee7f9; /* accent from site */
+}
+
+.controls label {
+  display: block;
+  margin: 0.25rem 0;
+  font-weight: 600;
+  color: #ffffff; /* plus blanche */
+}
+
+.controls select,
+.controls input[type="checkbox"],
+.controls input[type="radio"] {
+  margin-right: 0.5rem;
+}
+
+.controls .btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #6ee7f9; /* site primary */
+  color: #0b0f1a; /* site button text */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.08s ease;
+}
+
+.controls .btn:hover {
+  background: #4fd5e8;
+  transform: translateY(-1px);
+}
+
+.display-toggles label {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+/* Compact styles */
+.controls .compact-card { padding: 0.75rem; }
+.controls .compact .control-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.controls .control-group { display: flex; flex-direction: column; min-width: 120px; }
+.controls .control-group label { font-size: 0.9rem; margin-bottom: 0.35rem; font-weight:700; color:#ffffff; }
+
+/* More specific fallback in case other styles override these labels */
+.controls .grid .card .control-group label,
+.controls .grid .card label {
+  color: #ffffff !important;
+}
+.controls .control-group select { padding: 6px 8px; border-radius:6px; border:1px solid #27303f; background:#0b0f1a; color:#f0f0f0; font-size:0.9rem; }
+
+/* Force select/option readable colors across browsers */
+.controls select {
+  background-color: #0b0f1a; /* dark background */
+  color: #f8fafc; /* near-white text */
+  border: 1px solid #27303f;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #6ee7f9 50%), linear-gradient(135deg, #6ee7f9 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+.controls select option {
+  background-color: #121829; /* dropdown option background */
+  color: #f8fafc; /* option text */
+}
+
+/* Some browsers ignore option styling; provide a visible border and darker menu color when possible */
+select:focus { outline: 2px solid rgba(110,231,249,0.15); }
+select::-ms-expand { display: none; }
+
+.controls .indicators { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+.controls .indicators .ind-label { font-weight:600; margin-right:0.5rem; color:#cbd5e1; }
+.controls .indicators .chk { display:flex; align-items:center; gap:0.35rem; font-size:0.9rem; color:#e6eef8; }
+.controls .indicators input[type="checkbox"] { width:16px; height:16px; accent-color: #6ee7f9; }
+
+.controls .display-toggles { display:flex; gap:0.4rem; align-items:center; }
+.controls .indicators-row { display:flex; gap:1rem; align-items:center; flex-wrap:nowrap; }
+.controls .indicators-row .indicators { flex: 1 1 auto; min-width:0; }
+.controls .indicators-row .display-toggles { flex: 0 0 auto; margin-left: auto; }
+.controls .display-toggles .toggle { white-space:nowrap; }
+.controls .display-toggles .toggle { background:#0f1724; border-radius:6px; padding:6px 8px; cursor:pointer; display:flex; align-items:center; gap:0.4rem; border:1px solid #233040; color:#cbd5e1; }
+.controls .display-toggles input[type="radio"] { width:14px; height:14px; margin:0; accent-color:#6ee7f9; }
+.controls .display-toggles .toggle span { font-size:0.9rem; color:#cbd5e1; }
+.controls .display-toggles .toggle input:checked + span { color:#6ee7f9; font-weight:700; }
+
+.controls .actions-row { display:flex; justify-content:flex-end; }
+.controls .actions-row .btn { padding: 0.5rem 0.9rem; font-weight:600; border-radius:8px; }
+
+/* Small screens */
+@media (max-width: 640px) {
+  .controls .control-row { flex-direction:column; align-items:stretch; }
+  .controls .actions-row { justify-content:stretch; }
+  .controls .indicators-row { flex-wrap:wrap; }
+  .controls .indicators-row .display-toggles { margin-left: 0; }
+}
+
