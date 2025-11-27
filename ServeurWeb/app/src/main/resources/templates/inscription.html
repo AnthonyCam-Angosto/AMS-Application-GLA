@@ -10,6 +10,7 @@
     <div class="container">
         <h1>Créer un compte</h1>
         <form id="signupForm" th:action="@{/inscription}" th:object="${user}" method="post" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
             <div class="form-group">
             <label for="email">Email</label>

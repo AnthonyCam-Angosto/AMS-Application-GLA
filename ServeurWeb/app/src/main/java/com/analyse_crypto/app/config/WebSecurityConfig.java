@@ -1,13 +1,12 @@
 package com.analyse_crypto.app.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import static org.springframework.security.crypto.argon2.Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -30,8 +29,21 @@ public class WebSecurityConfig {
         })
         .formLogin(form ->form.loginPage("/login").permitAll().defaultSuccessUrl("/"))
         .logout(logout->logout.permitAll().logoutSuccessUrl("/login?logout"))
-        .csrf(AbstractHttpConfigurer::disable)
-        .headers(headers->headers.frameOptions(frameOptions->frameOptions.sameOrigin()));
+        .headers(headers->headers
+            .frameOptions(frameOptions->frameOptions.sameOrigin())
+            .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; " +
+                                        "script-src 'self' https://cdn.jsdelivr.net; " +
+                                        "style-src 'self' https://fonts.googleapis.com; " +
+                                        "font-src 'self' https://fonts.gstatic.com; " +
+                                        "img-src 'self' data:; " +
+                                        "object-src 'none'; " +
+                                        "base-uri 'self'; " +
+                                        "form-action 'self'; " +
+                                        "frame-ancestors 'self'; " +
+                                        "upgrade-insecure-requests")
+                    )
+                );
         
         return http.build();
     }
@@ -40,4 +52,12 @@ public class WebSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return defaultsForSpringSecurity_v5_8();
     }
+
+    @Bean
+    public ServletContextInitializer initializer() {
+        return servletContext -> servletContext.setSessionTrackingModes(
+            java.util.Collections.singleton(jakarta.servlet.SessionTrackingMode.COOKIE)
+    );
+}
+
 }

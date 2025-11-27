@@ -1,0 +1,11 @@
+groups:
+  - name: spring-app-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status="500"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Taux d’erreurs élevé"
+          description: "Plus de 10% des requêtes échouent"

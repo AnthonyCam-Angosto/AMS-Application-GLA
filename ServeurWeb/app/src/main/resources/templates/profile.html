@@ -33,6 +33,7 @@
             <span class="close" onclick="closeModal('emailModal')">&times;</span>
             <h2>Modifier mon email</h2>
             <form th:action="@{/profile/change-email}" th:object="${EmailChangeForm}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="form-group">
                 <label for="newEmail">Nouvel email</label>
                 <input type="email" th:field="*{newEmail}" id="newEmail" name="newEmail" required>
@@ -49,6 +50,7 @@
             <span class="close" onclick="closeModal('PasswordModal')">&times;</span>
             <h2>Modifier mon mot de passe</h2>
             <form th:action="@{/profile/change-password}" th:object="${PasswordChangeForm}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="form-group">
                 <label for="oldPassword">Ancien mot de passe</label>
                 <input type="password" id="oldPassword" th:field="*{oldPassword}" name="oldPassword" required>
