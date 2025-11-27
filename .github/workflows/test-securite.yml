@@ -20,9 +20,11 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
+        working-directory: ServeurWeb/app
         run: mvn clean package -DskipTests -Ptest
 
       - name: Run Spring Boot app
+        working-directory: ServeurWeb/app
         run: |
           nohup java -jar target/*.jar &
           sleep 20
