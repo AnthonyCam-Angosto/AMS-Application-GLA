@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.analyse_crypto.app.config.CustomUserDetails;
 import com.analyse_crypto.app.tables.RoleUser;
@@ -60,6 +61,7 @@ public class ProfileControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(null);
 
         mockMvc.perform(post("/profile/change-email")
+                        .with(csrf())
                         .param("newEmail", "user@google.com")
                         .with(user(customUser)))
                         .andExpect(status().isOk())
@@ -76,6 +78,7 @@ public class ProfileControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(null);
 
         mockMvc.perform(post("/profile/change-email")
+                        .with(csrf())
                         .with(SecurityMockMvcRequestPostProcessors.user(customUser))
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("newEmail", user.getEmail()))
@@ -92,6 +95,7 @@ public class ProfileControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(null);
 
         mockMvc.perform(post("/profile/change-email")
+                        .with(csrf())
                         .with(SecurityMockMvcRequestPostProcessors.user(customUser))
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("newEmail", user.getEmail()))
@@ -105,6 +109,7 @@ public class ProfileControllerTest {
         CustomUserDetails customUser=new CustomUserDetails(user);
 
         mockMvc.perform(post("/profile/change-email")
+                        .with(csrf())
                         .with(SecurityMockMvcRequestPostProcessors.user(customUser))
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("newEmail",""))
@@ -121,6 +126,7 @@ public class ProfileControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(null);
 
         mockMvc.perform(post("/profile/change-password")
+                        .with(csrf())
                         .param("oldPassword", "test")
                         .param("newPassword", "user")
                         .with(user(customUser)))
@@ -137,6 +143,7 @@ public class ProfileControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(null);
 
         mockMvc.perform(post("/profile/change-password")
+                        .with(csrf())
                         .param("oldPassword", "eee")
                         .param("newPassword", "val")
                         .with(user(customUser)))
@@ -152,6 +159,7 @@ public class ProfileControllerTest {
         CustomUserDetails customUser=new CustomUserDetails(user);
 
         mockMvc.perform(post("/profile/change-password")
+                        .with(csrf())
                         .param("oldPassword", "test")
                         .param("newPassword", "")
                         .with(user(customUser)))
