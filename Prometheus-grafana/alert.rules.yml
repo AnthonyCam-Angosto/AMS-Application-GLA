@@ -9,3 +9,33 @@ groups:
         annotations:
           summary: "Taux d’erreurs élevé"
           description: "Plus de 10% des requêtes échouent"
+
+  - name: celery-db-update
+    rules:
+    - alert: CeleryTaskNotRunning
+      expr: increase(db_update_success_total[15m]) < 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "La tâche Celery n’a pas reussi depuis 15 min"
+        description: "La tâche de mise à jour BD (toutes les 5 min) n’a pas été exécutée récemment ou n'a pas fonctionner"
+
+    - alert: CeleryTaskFailures
+      expr: increase(db_update_failure_total[15m]) > 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "La tâche Celery échoue"
+        description: "Des échecs ont été détectés dans les 15 dernières minutes."
+    
+    - alert: CeleryTaskTooSlow
+      expr: histogram_quantile(0.95, rate(db_update_duration_seconds_bucket[5m])) > 60
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "La tâche Celery est trop lente"
+        description: "95% des exécutions prennent plus de 60 secondes."
+

@@ -56,10 +56,5 @@ public class DashBoardControllerTest {
                         .param("range", "7")
                         .param("typeC", "BTC"))
                .andExpect(status().isOk());
-
-              // .andExpect(jsonPath("$[0].open").value(val))
-              // .andExpect(jsonPath("$[0].close").value(val))
-              // .andExpect(jsonPath("$[0].high").value(val))
-             //  .andExpect(jsonPath("$[0].low").value(val));
     }
 }

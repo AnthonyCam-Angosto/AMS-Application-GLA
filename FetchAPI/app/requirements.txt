@@ -1,3 +1,5 @@
 psycopg2
 requests
 pandas
+celery[redis]
+prometheus_client

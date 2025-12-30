@@ -16,14 +16,4 @@ def old(cryptos:list[tuple]):
         elif(current_date.date()>date.date()):
             diff=current_date-date
             fetch.update_crypto_days(crypto,diff.days)
-        sleep(1.5)
 
-
-def main_loop(cryptos:list[tuple]):
-    time_sleep=60*6
-    print("start boucle")
-    while True:
-        sleep(time_sleep)
-        current_date=datetime.now()
-        for crypto in cryptos:
-            fetch.update_crypto_min(crypto)

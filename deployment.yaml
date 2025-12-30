@@ -15,33 +15,44 @@ spec:
       containers:
         - name: db
           image: ams-application-gla-db:latest
-          env:
-            - name: POSTGRES_USER
-              value: "docker"
-            - name: POSTGRES_PASSWORD
-              value: "docker"
-            - name: POSTGRES_DB
-              value: "info_crypto"
           ports:
             - containerPort: 5432
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fetchapi-Deployment
+  name: fetchapi-worker-deployment
 spec:
   replicas: 1 
   selector:
     matchLabels:
-      app: fetchapi
+      app: fetchapi-worker
   template:
     metadata:
       labels:
-        app: fetchapi
+        app: fetchapi-worker
     spec:
       containers:
-        - name: fetchapi
-          image: ams-application-gla-fetchapi:latest
+        - name: fetchapi-worker
+          image: ams-application-gla-fetchapi-worker:latest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fetchapi-beat-deployment
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: fetchapi-beat
+  template:
+    metadata:
+      labels:
+        app: fetchapi-beat
+    spec:
+      containers:
+        - name: fetchapi-beat
+          image: ams-application-gla-fetchapi-beat:latest
 ---
 apiVersion: apps/v1
 kind: Deployment

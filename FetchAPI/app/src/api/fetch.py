@@ -63,12 +63,12 @@ def arrondir_jours(valeur: int) -> int:
     return max(valeurs_valides)
 
 
-def update_crypto_days(crypto:tuple,range=7):
+def update_crypto_days(crypto:tuple,_range=7):
     name_crypto=create_name(crypto)
     url = f"https://api.coingecko.com/api/v3/coins/{name_crypto}/ohlc"
-    range=arrondir_jours(range)
+    _range=arrondir_jours(_range)
 
-    params = {"vs_currency": "eur", "days": range,"x_cg_demo_api_key":api_key}
+    params = {"vs_currency": "eur", "days": _range,"x_cg_demo_api_key":api_key}
     response = requests.get(url,params=params)
     if response.status_code!=200:
         print(response,response.json())
