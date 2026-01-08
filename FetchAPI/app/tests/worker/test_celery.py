@@ -6,8 +6,8 @@ from src.worker import celery
 
 def test_app_configuration():
     app = celery.app
-    assert app.conf.broker_url == 'redis://localhost:6379/0'
-    assert app.conf.result_backend == 'redis://localhost:6379/0'
+    assert app.conf.broker_url == 'redis://redis:6379/0'
+    assert app.conf.result_backend == 'redis://redis:6379/0'
     assert app.conf.timezone == 'Europe/Paris'
     assert 'update_crypto-toutes-5-minutes' in app.conf.beat_schedule
 
