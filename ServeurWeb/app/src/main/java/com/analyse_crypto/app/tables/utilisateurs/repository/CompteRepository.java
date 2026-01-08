@@ -10,4 +10,6 @@ import com.analyse_crypto.app.tables.utilisateurs.Portefeuille;
 
 public interface CompteRepository extends JpaRepository<Compte, Long> {
     List<Compte> findByPortefeuille(Portefeuille portefeuille);
+    Compte findByPortefeuilleAndCrypto_Symbole(Portefeuille portefeuille, String symbole);
+
 }

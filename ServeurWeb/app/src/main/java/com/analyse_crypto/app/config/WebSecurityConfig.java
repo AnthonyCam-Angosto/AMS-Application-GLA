@@ -9,6 +9,11 @@ import static org.springframework.security.crypto.argon2.Argon2PasswordEncoder.d
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Configuration de sécurité Spring Security pour l'application.
+ *
+ * Définit les règles d'accès, la page de login et l'encodeur de mots de passe.
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {

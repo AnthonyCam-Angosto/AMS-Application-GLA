@@ -13,6 +13,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+/**
+ * Entité représentant un portefeuille d'un utilisateur.
+ *
+ * Un portefeuille appartient à un `User` et possède un nom unique.
+ */
 @Entity
 @Table(
     name = "portefeuilles",

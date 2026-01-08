@@ -7,6 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entité représentant une cryptomonnaie référencée dans l'application.
+ *
+ * Contient son identifiant interne, le symbole et le nom lisible.
+ */
 @Entity
 @Table(name="cryptos")
 public class Crypto {
@@ -37,6 +42,10 @@ public class Crypto {
     }
     public String getSymbole() {
         return symbole;
+    }
+
+    public void setSymbole(String symbole) {
+        this.symbole = symbole;
     }
     
 }

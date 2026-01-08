@@ -14,6 +14,12 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Entité représentant un utilisateur de l'application.
+ *
+ * Contient les informations d'identification, le rôle et le mot de passe
+ * (stocké de façon encodée).
+ */
 @Entity
 @Table(
     name = "users",
@@ -44,6 +50,7 @@ public class User {
     private RoleUser role = RoleUser.UTILISATEUR;
 
     public User(){}
+    /** Constructeur par défaut. */
 
     public User(String identifiant, String email, String password, RoleUser role) {
         this.identifiant = identifiant;

@@ -14,18 +14,29 @@ import com.analyse_crypto.app.config.exception.EmailAlreadyUsedException;
 import com.analyse_crypto.app.config.exception.IdentifiantAlreadyUsedException;
 import com.analyse_crypto.app.tables.utilisateurs.User;
 
+/**
+ * Contrôleur gérant l'inscription des utilisateurs.
+ *
+ * Expose les endpoints d'affichage et de traitement du formulaire
+ * d'inscription et délègue la logique métier à `UserService`.
+ */
 @Controller
 public class InscriptionController {
 
     @Autowired
     UserService userService;
 
+    /** Affiche le formulaire d'inscription. */
     @GetMapping("/inscription")
     public String afficherFormulaire(Model model) {
         model.addAttribute("user",new User());
         return "inscription";
     }
 
+    /**
+     * Traite l'envoi du formulaire d'inscription. Lance des exceptions
+     * métier si l'email ou l'identifiant sont déjà utilisés.
+     */
     @PostMapping("/inscription")
     public String inscription(@Validated @ModelAttribute("user") User user,BindingResult result){
         try {

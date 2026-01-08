@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -18,20 +19,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.analyse_crypto.app.config.UserService;
+import com.analyse_crypto.app.service.alerts.AlertService;
+import com.analyse_crypto.app.service.notification.NotificationService;
 import com.analyse_crypto.app.tables.utilisateurs.User;
 
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
-public class InscriptionControllerTest {
+class InscriptionControllerTest {
     
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
     private UserService userService;
+
+    @MockBean 
+    private AlertService alertService; 
+
+    @MockBean 
+    private NotificationService notificationService;
 
     @Test
     void test_Inscription_Page() throws Exception {

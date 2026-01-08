@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -24,14 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.analyse_crypto.app.config.CustomUserDetails;
+import com.analyse_crypto.app.service.alerts.AlertService;
+import com.analyse_crypto.app.service.notification.NotificationService;
 import com.analyse_crypto.app.tables.RoleUser;
 import com.analyse_crypto.app.tables.utilisateurs.User;
 import com.analyse_crypto.app.tables.utilisateurs.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
-public class ProfileControllerTest {
+class ProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,6 +42,12 @@ public class ProfileControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean 
+    private AlertService alertService; 
+
+    @MockBean 
+    private NotificationService notificationService;
 
     @Test
     void test_profile_Page() throws Exception {

@@ -14,9 +14,19 @@ spec:
     spec:
       containers:
         - name: db
-          image: ams-application-gla-db:latest
+          image: postgres:latest
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "docker"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_DB
+              value: "cryptoview"
           ports:
             - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,7 +44,18 @@ spec:
     spec:
       containers:
         - name: fetchapi-worker
-          image: ams-application-gla-fetchapi-worker:latest
+          image: fetchapi-worker
+          env:
+            - name: POSTGRES_HOST
+              value: "db-service"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_PASSWORD
+              value: "docker"
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -52,7 +73,18 @@ spec:
     spec:
       containers:
         - name: fetchapi-beat
-          image: ams-application-gla-fetchapi-beat:latest
+          image: fetchapi-beat
+          env:
+            - name: POSTGRES_HOST
+              value: "db-service"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_PASSWORD
+              value: "docker"
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,6 +102,139 @@ spec:
     spec:
       containers: 
         - name: serveurweb
-          image: ams-application-gla-serveurweb:latest
+          image: serveurweb
+          env:
+            - name: DATABASE_HOST
+              value: "db-service"
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: "cryptoview"
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              value: "docker"
+            - name: SPRING_MAIL_HOST
+              value: "mailhog-service"
+            - name: SPRING_MAIL_PORT
+              value: "1025"
           ports:
             - containerPort: 80
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+
+---
+# Mailhog Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailhog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailhog
+  template:
+    metadata:
+      labels:
+        app: mailhog
+    spec:
+      containers:
+        - name: mailhog
+          image: mailhog/mailhog:latest
+          ports:
+            - containerPort: 1025
+            - containerPort: 8025
+
+---
+# Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  selector:
+    app: db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailhog-service
+spec:
+  selector:
+    app: mailhog
+  ports:
+    - protocol: TCP
+      port: 1025
+      targetPort: 1025
+    - protocol: TCP
+      port: 8025
+      targetPort: 8025
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serveurweb-service
+spec:
+  selector:
+    app: serveurweb
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort
+
+---
+# PersistentVolumeClaim for Postgres data (maps to ./db/data in compose)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

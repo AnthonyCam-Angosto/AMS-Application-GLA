@@ -13,6 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entité représentant un enregistrement OHLC (Open/High/Low/Close)
+ * pour une cryptomonnaie à un instant donné.
+ */
 @Entity
 @Table(name = "crypto_history")
 public class CryptoHistory {

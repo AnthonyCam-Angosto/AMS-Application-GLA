@@ -1,267 +1,488 @@
-// Utilitaires indicateurs
-function sma(values, period) {
-  const out = [];
-  for (let i = 0; i < values.length; i++) {
-    if (i < period - 1) { out.push(null); continue; }
-    const slice = values.slice(i - period + 1, i + 1);
-    const avg = slice.reduce((a, b) => a + b, 0) / period;
-    out.push(avg);
-  }
-  return out;
-}
+/**
+ * Module de graphiques du dashboard : calculs techniques et rendu Chart.js.
+ */
+let priceChart = null;
 
-function ema(values, period) {
-  const k = 2 / (period + 1);
-  const out = [];
-  let prev = null;
-  for (let i = 0; i < values.length; i++) {
-    const price = values[i];
-    if (i === 0) { prev = price; out.push(prev); continue; }
-    const e = price * k + prev * (1 - k);
-    prev = e;
-    out.push(e);
-  }
-  // align with nulls for initial warm-up
-  for (let i = 0; i < period - 1; i++) out[i] = null;
-  return out;
-}
-
-function rsi(values, period = 14) {
-  const gains = [];
-  const losses = [];
-  for (let i = 1; i < values.length; i++) {
-    const diff = values[i] - values[i - 1];
-    gains.push(Math.max(diff, 0));
-    losses.push(Math.max(-diff, 0));
-  }
-  const avgGain = sma(gains, period).map(v => (v == null ? null : v));
-  const avgLoss = sma(losses, period).map(v => (v == null ? null : v));
-  const rsiVals = [null]; // align to same length as prices
-  for (let i = 0; i < avgGain.length; i++) {
-    const g = avgGain[i], l = avgLoss[i];
-    if (g == null || l == null) { rsiVals.push(null); continue; }
-    const rs = l === 0 ? 100 : (g / l);
-    const rsi = 100 - (100 / (1 + rs));
-    rsiVals.push(rsi);
-  }
-  return rsiVals;
-}
-
-async function fetchOHLC(days = 30, asset = "BTC") {
-  const response = await fetch(`/dashboard/ohlc?range=${days}&typeC=${asset}`);
-  if (!response.ok) {
-    throw new Error("Erreur API OHLC");
-  }
-  return await response.json();
-}
-
-function ohlcToClose(ohlc) {
-  return ohlc.map(d => d.closePrice);
-}
-
-function ohlcToLabels(ohlc) {
-  // Convertir dateTime en objet Date pour Chart.js (time scale)
-  return ohlc.map(d => new Date(d.dateTime));
-}
-
-function computeDailyReturns(ohlc) {
-  const returns = [];
-  for (let i = 1; i < ohlc.length; i++) {
-    const prevClose = ohlc[i - 1].closePrice;
-    const currClose = ohlc[i].closePrice;
-    const r = (currClose - prevClose) / prevClose;
-    returns.push({ 
-      t: new Date(ohlc[i].dateTime), 
-      r 
+// --- Calcul SMA ---
+/**
+ * Calcule la SMA (Simple Moving Average) pour une série.
+ * @param {number[]} data - Série de valeurs numériques
+ * @param {number} period - Période de la moyenne
+ * @returns {Array<number|null>} Tableau aligné avec la série (null pour indices insuffisants)
+ */
+function calcSMA(data, period) {
+    return data.map((_, i) => {
+        if (i < period) return null;
+        const slice = data.slice(i - period, i);
+        const sum = slice.reduce((a, b) => a + b, 0);
+        return sum / period;
     });
-  }
-  return returns;
 }
 
-// Pour le candlestick Chart.js Financial plugin, il faut un objet {x, o, h, l, c}
-function formatForCandlestick(ohlc) {
-  return ohlc.map(d => ({
-    x: new Date(d.dateTime),
-    o: d.openPrice,
-    h: d.highPrice,
-    l: d.lowPrice,
-    c: d.closePrice
-  }));
-}
+// --- Calcul EMA ---
+/**
+ * Calcule l'EMA (Exponential Moving Average) pour une série.
+ * @param {number[]} data - Série de valeurs numériques
+ * @param {number} period - Période de l'EMA
+ * @returns {Array<number|null>} Tableau aligné avec la série
+ */
+function calcEMA(data, period) {
+    const k = 2 / (period + 1);
+    let emaArray = [null];
 
-// Contexte chart
-let priceChart, rsiChart, heatmapChart;
-
-function destroyIfExists(chart) {
-  if (chart) chart.destroy();
-}
-
-// Construction des graphiques
-function buildLineChart(ctx, labels, closes, overlays) {
-  return new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Prix (Close)', data: closes, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', tension: 0.2 },
-        ...(overlays.sma20 ? [{ label: 'SMA 20', data: sma(closes, 20), borderColor: '#22c55e', borderWidth: 1.5 }] : []),
-        ...(overlays.ema50 ? [{ label: 'EMA 50', data: ema(closes, 50), borderColor: '#f59e0b', borderWidth: 1.5 }] : []),
-      ]
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: { type: 'time', time: { unit: 'day' } },
-        y: { beginAtZero: false }
-      },
-      plugins: { legend: { display: true } }
-    }
-  });
-}
-
-function buildCandlestickChart(ctx, ohlc) {
-  return new Chart(ctx, {
-    type: 'candlestick',
-    data: {
-      datasets: [{
-        label: 'OHLC',
-        data: ohlc,
-        borderColor: { up: '#22c55e', down: '#ef4444', unchanged: '#64748b' },
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: { type: 'time', time: { unit: 'day' } },
-        y: { beginAtZero: false }
-      }
-    }
-  });
-}
-
-function buildRsiChart(ctx, labels, closes, showRsi) {
-  return new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: showRsi ? [{
-        label: 'RSI 14',
-        data: rsi(closes, 14),
-        borderColor: '#a855f7',
-        tension: 0.2
-      }] : []
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: { type: 'time', time: { unit: 'day' } },
-        y: { min: 0, max: 100, grid: { color: '#e5e7eb' } }
-      },
-      plugins: {
-        legend: { display: true },
-        annotation: {
-          annotations: {
-            overbought: { type: 'line', yMin: 70, yMax: 70, borderColor: '#ef4444' },
-            oversold: { type: 'line', yMin: 30, yMax: 30, borderColor: '#22c55e' }
-          }
+    for (let i = 1; i < data.length; i++) {
+        if (i < period) {
+            emaArray.push(null);
+        } else if (i === period) {
+            const sma = data.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            emaArray.push(sma);
+        } else {
+            emaArray.push(data[i] * k + emaArray[i - 1] * (1 - k));
         }
-      }
     }
-  });
+    return emaArray;
 }
 
-function buildHeatmapChart(ctx, returns) {
-  // Exemple: matrice jour x semaine avec intensité = rendement
-  const cells = returns.map((d) => {
-    const day = d.t.getDate();
-    const week = Math.floor((d.t.getDate() - 1) / 7); // 0..4
-    return { x: day, y: week, v: d.r };
-  });
+// --- Charger les données OHLC ---
+/**
+ * Charge les données OHLC depuis l'API et les trie.
+ * @returns {Promise<{labels: Date[], closePrices: number[]}>}
+ */
+async function loadOHLC() {
+    const asset = document.getElementById("crypto").value;
+    const days = document.getElementById("range").value;
 
-  return new Chart(ctx, {
-    type: 'matrix',
-    data: {
-      datasets: [{
-        label: 'Rendements journaliers',
-        data: cells,
-        backgroundColor(ctx) {
-          const v = ctx.raw.v;
-          const base = v >= 0 ? 'rgba(34,197,94,' : 'rgba(239,68,68,';
-          const alpha = Math.min(1, Math.abs(v) * 8);
-          return base + alpha + ')';
-        },
-        // ✅ Vérification que chartArea existe avant d’y accéder
-        width: (ctx) => {
-          const area = ctx.chart.chartArea;
-          return area ? (area.width / 31) - 2 : 0;
-        },
-        height: (ctx) => {
-          const area = ctx.chart.chartArea;
-          return area ? (area.height / 5) - 2 : 0;
-        },
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: { type: 'linear', min: 1, max: 31, ticks: { stepSize: 1 } },
-        y: { type: 'linear', min: 0, max: 4, ticks: { callback: v => `Semaine ${v + 1}` } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => `Jour ${ctx.raw.x}, Semaine ${ctx.raw.y + 1}: ${(ctx.raw.v*100).toFixed(2)}%`
-          }
+    const url = `/dashboard/ohlc?range=${days}&typeC=${asset}`;
+    const response = await fetch(url);
+    const ohlc = await response.json();
+
+    //console.log("OHLC reçu :", ohlc);
+
+    const sorted = ohlc.sort((a, b) => { 
+      return new Date(a.dateTime) - new Date(b.dateTime); 
+    });
+
+    //console.log("sorted reçu :", ohlc);
+
+    const labels = sorted.map(d => new Date(d.dateTime));
+    const closePrices = sorted.map(d => d.closePrice);
+
+    return { labels, closePrices };
+}
+
+// --- Afficher le graphique en courbes ---
+/**
+ * Rendu du graphique en courbes (Close + indicateurs SMA/EMA optionnels).
+ * Lit les contrôles de la page pour déterminer les options d'affichage.
+ */
+async function renderLineChart() {
+    const { labels, closePrices } = await loadOHLC();
+
+    const showSMA = document.getElementById("sma20").checked;
+    const showEMA = document.getElementById("ema50").checked;
+
+    const sma20 = showSMA ? calcSMA(closePrices, 20) : null;
+    const ema50 = showEMA ? calcEMA(closePrices, 50) : null;
+
+    // Détruire l'ancien graphique
+    if (priceChart) priceChart.destroy();
+
+    const ctx = document.getElementById("priceChart").getContext("2d");
+
+    // --- Construction propre du tableau datasets ---
+    const datasets = [
+        {
+            label: "Prix (Close)",
+            data: closePrices,
+            borderColor: "#4e79a7",
+            borderWidth: 2,
+            tension: 0.2,
+            pointRadius: 1
         }
-      }
+    ];
+
+    if (showSMA) {
+        datasets.push({
+            label: "SMA 20",
+            data: sma20,
+            borderColor: "#f28e2b",
+            borderWidth: 1.5,
+            tension: 0.2,
+            pointRadius: 0
+        });
     }
-  });
+
+    if (showEMA) {
+        datasets.push({
+            label: "EMA 50",
+            data: ema50,
+            borderColor: "#e15759",
+            borderWidth: 1.5,
+            tension: 0.2,
+            pointRadius: 0
+        });
+    }
+
+    // --- Création du graphique ---
+    priceChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: "time",
+                    time: { unit: "day" }
+                },
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Rendu d'un graphique en chandeliers (OHLC) en utilisant Chart.js Financial.
+ * @returns {Promise<Array>} Retourne les données triées (utile pour d'autres visuels)
+ */
+async function renderCandleChart() {
+    // Charger les données OHLC complètes
+    const asset = document.getElementById("crypto").value;
+    const days = document.getElementById("range").value;
+
+    const url = `/dashboard/ohlc?range=${days}&typeC=${asset}`;
+    const response = await fetch(url);
+    const ohlc = await response.json();
+
+    // Trier par date croissante
+    const sorted = ohlc.slice().sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+    // Transformer en format Chart.js Financial
+    const candleData = sorted.map(d => ({
+        x: new Date(d.dateTime),
+        o: Number(d.openPrice),
+        h: Number(d.highPrice),
+        l: Number(d.lowPrice),
+        c: Number(d.closePrice)
+    }));
+
+    // Détruire l'ancien graphique
+    if (priceChart) priceChart.destroy();
+
+    const ctx = document.getElementById("priceChart").getContext("2d");
+
+    // Création du graphique chandeliers
+    priceChart = new Chart(ctx, {
+        type: "candlestick",
+        data: {
+            labels: sorted.map(d => new Date(d.dateTime)),
+            datasets: [
+                {
+                    label: "Chandeliers (OHLC)",
+                    data: candleData,
+                    borderColor: "#000",
+                    color: {
+                        up: "#26a69a",
+                        down: "#ef5350",
+                        unchanged: "#999"
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: "time",
+                    time: { unit: "day" }
+                },
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+
+    return sorted; // utile pour RSI, heatmap, etc.
+}
+
+/**
+ * Rendu d'une heatmap (bar chart coloré) des rendements journaliers.
+ */
+async function renderHeatmapChart() {
+    // Charger les données OHLC
+    const asset = document.getElementById("crypto").value;
+    const days = document.getElementById("range").value;
+
+    const url = `/dashboard/ohlc?range=${days}&typeC=${asset}`;
+    const response = await fetch(url);
+    const ohlc = await response.json();
+
+    // Trier par date croissante
+    const sorted = ohlc.slice().sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+    // Labels = dates
+    const labels = sorted.map(d => new Date(d.dateTime));
+
+    // Clôtures = base du rendement
+    const closePrices = sorted.map(d => Number(d.closePrice));
+
+    // Calcul des rendements
+    const returns = calcReturns(closePrices);
+
+    // Couleurs selon rendement
+    const colors = returns.map(r => returnToColor(r));
+
+    // Détruire l'ancien graphique heatmap
+    if (heatmapChart) heatmapChart.destroy();
+
+    const ctx = document.getElementById("heatmapChart").getContext("2d");
+
+    // Création du graphique heatmap
+    heatmapChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Rendements (%)",
+                    data: returns,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.raw?.toFixed(2)} %`
+                    }
+                }
+            },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            }
+        }
+    });
 }
 
 
-// Initialisation
-document.addEventListener('DOMContentLoaded', async () => {
-  const priceCtx = document.getElementById('priceChart').getContext('2d');
-  const rsiCtx = document.getElementById('rsiChart').getContext('2d');
-  const heatCtx = document.getElementById('heatmapChart').getContext('2d');
 
-  let ohlc = await fetchOHLC(30, "BTC");
-  let closes = ohlcToClose(ohlc);
-  let labels = ohlcToLabels(ohlc);
 
-  priceChart = buildLineChart(priceCtx, labels, closes, { sma20: true, ema50: true });
-  rsiChart = buildRsiChart(rsiCtx, labels, closes, true);
-  heatmapChart = buildHeatmapChart(heatCtx, computeDailyReturns(ohlc));
+// --- Bouton "Appliquer" ---
+document.getElementById("applyBtn").addEventListener("click", () => {
+    const chartType = document.querySelector("input[name='chartType']:checked").value;
+    renderRSI();
+    renderHeatmap();
 
-  const applyBtn = document.getElementById('applyBtn');
-  applyBtn.addEventListener('click', async () => {
-    const range = parseInt(document.getElementById('range').value, 10);
-    const chartType = document.querySelector('input[name="chartType"]:checked').value;
-    const showSMA = document.getElementById('sma20').checked;
-    const showEMA = document.getElementById('ema50').checked;
-    const showRSI = document.getElementById('rsi14').checked;
-    const crypto = document.getElementById('crypto').value;
-
-    ohlc = await fetchOHLC(range, crypto);
-    closes = ohlcToClose(ohlc);
-    labels = ohlcToLabels(ohlc);
-
-    destroyIfExists(priceChart);
-    destroyIfExists(rsiChart);
-    destroyIfExists(heatmapChart);
-
-    if (chartType === 'line') {
-      priceChart = buildLineChart(priceCtx, labels, closes, { sma20: showSMA, ema50: showEMA });
-    } else if (chartType === 'candlestick') {
-      priceChart = buildCandlestickChart(priceCtx, formatForCandlestick(ohlc));
-    } else if (chartType === 'heatmap') {
-      priceChart = buildHeatmapChart(priceCtx, computeDailyReturns(ohlc));
+    if (chartType === "line") {
+      renderLineChart();
     }
-
-    rsiChart = buildRsiChart(rsiCtx, labels, closes, showRSI);
-    heatmapChart = buildHeatmapChart(heatCtx, computeDailyReturns(ohlc));
-  });
+    if (chartType === "candlestick") { 
+      renderCandleChart();
+    }
+    if (chartType === "heatmap") { 
+      renderHeatmapChart();
+    }
 });
+
+// --- Charger une première fois ---
+document.addEventListener("DOMContentLoaded", () => {
+    renderLineChart();
+    renderRSI();
+    renderHeatmap();
+});
+
+
+/**
+ * Calcule l'indicateur RSI sur une série de prix.
+ * @param {number[]} data - Série de prix (close)
+ * @param {number} [period=14] - Période du RSI
+ * @returns {Array<number|null>} Valeurs RSI alignées
+ */
+function calcRSI(data, period = 14) {
+    const rsi = new Array(data.length).fill(null);
+
+    if (data.length < period) return rsi;
+
+    let gains = 0;
+    let losses = 0;
+
+    // Initial average gain/loss
+    for (let i = 1; i <= period; i++) {
+        const diff = data[i] - data[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses -= diff;
+    }
+
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+
+    rsi[period] = 100 - (100 / (1 + (avgGain / avgLoss)));
+
+    // Remaining RSI values
+    for (let i = period + 1; i < data.length; i++) {
+        const diff = data[i] - data[i - 1];
+
+        if (diff >= 0) {
+            avgGain = (avgGain * (period - 1) + diff) / period;
+            avgLoss = (avgLoss * (period - 1)) / period;
+        } else {
+            avgGain = (avgGain * (period - 1)) / period;
+            avgLoss = (avgLoss * (period - 1) - diff) / period;
+        }
+
+        const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+        rsi[i] = 100 - (100 / (1 + rs));
+    }
+
+    return rsi;
+}
+
+
+let rsiChart = null;
+
+/**
+ * Rendu du graphique RSI (utilise `calcRSI`).
+ */
+async function renderRSI() {
+    const { labels, closePrices } = await loadOHLC();
+
+    console.log("closePrices",closePrices);
+
+    const rsi = calcRSI(closePrices, 14);
+
+    if (rsiChart) rsiChart.destroy();
+
+    const ctx = document.getElementById("rsiChart").getContext("2d");
+
+    console.log("rsi",rsi);
+
+    rsiChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "RSI 14",
+                    data: rsi,
+                    borderColor: "#8e44ad",
+                    borderWidth: 1.5,
+                    tension: 0.2,
+                    pointRadius: 0
+                },
+                {
+                    label: "Zone 70",
+                    data: new Array(rsi.length).fill(70),
+                    borderColor: "#e74c3c",
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                },
+                {
+                    label: "Zone 30",
+                    data: new Array(rsi.length).fill(30),
+                    borderColor: "#3498db",
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100
+                },
+                x: {
+                    type: "time",
+                    time: { unit: "day" }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Calcule les rendements (%) entre closes consécutifs.
+ * @param {number[]} closePrices
+ * @returns {Array<number|null>} Rendements (%) (premier élément = null)
+ */
+function calcReturns(closePrices) {
+    const returns = [null]; // premier rendement impossible
+
+    for (let i = 1; i < closePrices.length; i++) {
+        const r = ((closePrices[i] - closePrices[i - 1]) / closePrices[i - 1]) * 100;
+        returns.push(r);
+    }
+
+    return returns;
+}
+
+/**
+ * Convertit un rendement en couleur RGBA pour la heatmap.
+ * @param {number|null} r - Rendement en % ou null
+ * @returns {string} Couleur CSS
+ */
+function returnToColor(r) {
+    if (r === null) return "rgba(0,0,0,0)";
+
+    const intensity = Math.min(Math.abs(r) / 5, 1); // normalisation
+
+    if (r >= 0) {
+        return `rgba(0, 200, 0, ${0.2 + intensity * 0.8})`; // vert
+    } else {
+        return `rgba(200, 0, 0, ${0.2 + intensity * 0.8})`; // rouge
+    }
+}
+let heatmapChart = null;
+
+async function renderHeatmap() {
+    const { labels, closePrices } = await loadOHLC();
+
+    const returns = calcReturns(closePrices);
+
+    const colors = returns.map(r => returnToColor(r));
+
+    if (heatmapChart) heatmapChart.destroy();
+
+    const ctx = document.getElementById("heatmapChart").getContext("2d");
+
+    heatmapChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Rendements (%)",
+                data: returns,
+                backgroundColor: colors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.raw.toFixed(2)} %`
+                    }
+                }
+            },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            }
+        }
+    });
+}

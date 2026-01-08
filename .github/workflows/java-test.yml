@@ -30,4 +30,4 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       working-directory: ServeurWeb/app
-      run: mvn clean test -Ptest
+      run: mvn test -Ptest

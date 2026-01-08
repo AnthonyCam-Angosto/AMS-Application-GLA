@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>CryptoView - Alertes</title>
+  <link th:href="@{/styles/style.css}" href="../static/styles/style.css" rel="stylesheet">
+  <script th:src="@{/js/alerts.js}" src="../static/js/alerts.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="logo">CryptoView</div>
+  <nav>
+    <a th:href="@{/}">Accueil</a>
+    <a th:href="@{/dashboard}">Tableaux de bord</a>
+    <a th:href="@{/portfolio}">Portefeuille</a>
+    <a th:href="@{/alerts}" class="active">Alertes</a>
+    <a th:href="@{/forecast}">Prévisions</a>
+
+    <span sec:authorize="isAnonymous()">
+      <a th:href="@{/login}">Connexion</a>
+      <a th:href="@{/inscription}">Inscription</a>
+    </span>
+
+    <span sec:authorize="isAuthenticated()">
+      <a th:href="@{/profile}"><span sec:authentication="name"></span></a> |
+      <a th:href="@{/logout}">Déconnexion</a>
+    </span>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="page-header">
+    <h1>Alertes & Notifications</h1>
+    <p>Créez des alertes personnalisées pour être prévenu·e lorsque certaines conditions sont remplies.</p>
+  </section>
+
+  <section class="controls">
+    <div class="grid">
+
+      <div class="card">
+        <h3>Nouvelle alerte</h3>
+        <div th:if="${successMsg}" class="notice success" th:text="${successMsg}"></div>
+
+        <form th:action="@{/alerts}" th:object="${AlertForm}" method="post">
+
+          <label for="asset"><strong>Actif :</strong></label>
+          <select id="asset" th:field="*{asset}">
+            <option th:each="c : ${cryptos}" th:value="${c}" th:text="${c}"></option>
+          </select>
+
+          <label for="condition"><strong>Condition :</strong></label>
+          <select id="condition" th:field="*{condition}">
+            <option value=">">Supérieur à</option>
+            <option value="<">Inférieur à</option>
+            <option value="=">Égal à</option>
+          </select>
+
+          <label for="price"><strong>Seuil (prix) :</strong></label>
+          <input type="number" step="0.0001" id="price" th:field="*{price}">
+
+          <label for="method"><strong>Méthode de notification :</strong></label>
+          <select id="method" th:field="*{method}">
+            <option value="email">E-mail</option>
+            <option value="webhook">Webhook</option>
+          </select>
+
+          <label for="active"><strong>Active :</strong></label>
+          <input type="checkbox" id="active" th:field="*{active}">
+
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn">Créer l'alerte</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Alertes existantes</h3>
+        <p>Liste des alertes à venir (fonctionnalité future : gestion complète des alertes).</p>
+        <ul>
+          <li>Aucune alerte configurée.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2025 CryptoView — Tous droits réservés</p>
+  <p><a th:href="@{/legal}">Mentions légales</a> | <a th:href="@{/privacy}">Confidentialité</a> | <a th:href="@{/support}">Support</a></p>
+</footer>
+
+</body>
+</html>

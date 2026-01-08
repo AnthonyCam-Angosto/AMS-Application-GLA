@@ -1,0 +1,37 @@
+name: Push Docker Images to GHCR
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  push-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build images with docker compose
+        run: |
+          docker compose build
+
+      - name: Tag & Push images to GHCR (prefix only)
+        run: |
+          IMAGES=$(docker compose images --format '{{.Repository}}:{{.Tag}}')
+
+          for IMG in $IMAGES; do
+            # Ajoute simplement ghcr.io/ devant le nom existant
+            NEW_NAME="ghcr.io/${IMG}"
+
+            echo "Tagging $IMG as $NEW_NAME"
+            docker tag "$IMG" "$NEW_NAME"
+
+            echo "Pushing $NEW_NAME"
+            docker push "$NEW_NAME"
+          done

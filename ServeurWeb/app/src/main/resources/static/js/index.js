@@ -1,3 +1,7 @@
+/**
+ * Init Chart principal montrant un exemple de série BTC.
+ * Ce script instancie un graphique Chart.js de type `line`.
+ */
 const ctx = document.getElementById('cryptoChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',

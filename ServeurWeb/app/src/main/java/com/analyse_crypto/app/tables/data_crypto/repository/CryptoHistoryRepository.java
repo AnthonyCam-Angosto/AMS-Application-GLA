@@ -11,4 +11,6 @@ import com.analyse_crypto.app.tables.data_crypto.CryptoHistory;
 public interface CryptoHistoryRepository extends JpaRepository<CryptoHistory, Long> {
     List<CryptoHistory> findByCrypto(Crypto crypto);
     List<CryptoHistory> findByCryptoAndDateTimeBetween(Crypto crypto, LocalDateTime start, LocalDateTime end);
+    CryptoHistory findTopByCryptoOrderByDateTimeDesc(Crypto crypto);
+
 }

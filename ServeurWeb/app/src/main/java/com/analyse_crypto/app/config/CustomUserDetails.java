@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.analyse_crypto.app.tables.utilisateurs.User;
 
+/**
+ * Adaptateur `UserDetails` pour Spring Security basé sur l'entité `User`.
+ */
 public class CustomUserDetails implements UserDetails {
 
     private final User user;

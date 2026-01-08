@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.analyse_crypto.app.service.alerts.AlertService;
+import com.analyse_crypto.app.service.notification.NotificationService;
 import com.analyse_crypto.app.tables.data_crypto.Crypto;
 import com.analyse_crypto.app.tables.data_crypto.CryptoHistory;
 import com.analyse_crypto.app.tables.data_crypto.repository.CryptoHistoryRepository;
@@ -29,7 +32,6 @@ import com.analyse_crypto.app.tables.data_crypto.repository.CryptoRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
 public class DashBoardControllerTest {
     
     @Autowired
@@ -40,6 +42,12 @@ public class DashBoardControllerTest {
 
     @MockitoBean
     CryptoRepository cryptoRepo;
+
+    @MockBean 
+    private AlertService alertService; 
+
+    @MockBean 
+    private NotificationService notificationService;
 
 
     @Test

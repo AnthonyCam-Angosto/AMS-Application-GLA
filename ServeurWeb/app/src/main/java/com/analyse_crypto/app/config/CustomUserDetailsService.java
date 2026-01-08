@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import com.analyse_crypto.app.tables.utilisateurs.User;
 import com.analyse_crypto.app.tables.utilisateurs.repository.UserRepository;
 
+/**
+ * Service Spring Security pour charger un utilisateur par identifiant.
+ *
+ * Construit un `CustomUserDetails` à partir de l'entité `User`.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService{
 

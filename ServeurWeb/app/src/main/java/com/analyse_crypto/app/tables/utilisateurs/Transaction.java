@@ -17,6 +17,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entité représentant une opération financière liée à un compte.
+ *
+ * Stocke le type (entrée/sortie), le montant et la date de la transaction.
+ */
 @Entity
 @Table(name = "transactions")
 public class Transaction {

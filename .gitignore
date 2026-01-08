@@ -3,3 +3,5 @@
 FetchAPI/.scannerwork/
 
 db/data/
+
+**/__pycache__/

@@ -10,6 +10,11 @@ import com.analyse_crypto.app.tables.RoleUser;
 import com.analyse_crypto.app.tables.utilisateurs.User;
 import com.analyse_crypto.app.tables.utilisateurs.repository.UserRepository;
 
+/**
+ * Initialisation des données applicatives au démarrage.
+ *
+ * Ajoute un compte administrateur par défaut si nécessaire.
+ */
 @Configuration
 public class DataInitializer {
 

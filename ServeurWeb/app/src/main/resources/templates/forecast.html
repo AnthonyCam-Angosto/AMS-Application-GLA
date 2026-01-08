@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>CryptoView - Prévisions</title>
+
+  <link th:href="@{/styles/style.css}" href="../static/styles/style.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+  <script th:src="@{/js/forecast.js}" src="../static/js/forecast.js" defer></script>
+</head>
+
+<body>
+<header>
+  <div class="logo">CryptoView</div>
+  <nav>
+    <a th:href="@{/}">Accueil</a>
+    <a th:href="@{/dashboard}">Tableaux de bord</a>
+    <a th:href="@{/portfolio}">Portefeuille</a>
+    <a th:href="@{/alerts}">Alertes</a>
+    <a th:href="@{/forecast}" class="active">Prévisions</a>
+    <a th:href="@{/visualisations}">Visualisations</a>
+
+    <span sec:authorize="isAnonymous()">
+      <a th:href="@{/login}">Connexion</a>
+      <a th:href="@{/inscription}">Inscription</a>
+    </span>
+
+    <span sec:authorize="isAuthenticated()">
+      <a th:href="@{/profile}"><span sec:authentication="name"></span></a> |
+      <a th:href="@{/logout}">Déconnexion</a>
+    </span>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="page-header">
+    <h1>Prévisions & Modèles</h1>
+    <p>Analyse prédictive basée sur les tendances historiques et les indicateurs avancés.</p>
+  </section>
+
+  <!-- PARAMÈTRES -->
+  <section class="controls">
+    <div class="grid">
+
+      <!-- Carte paramètres -->
+      <div class="card">
+        <h3>Paramètres</h3>
+
+        <form id="forecast-form">
+          <label for="asset"><strong>Actif :</strong></label>
+          <select id="asset">
+            <option th:each="crypto : ${cryptos}"
+                        th:value="${crypto}"
+                        th:text="${crypto}">
+              </option>
+          </select>
+
+          <label for="range"><strong>Période d’historique :</strong></label>
+          <select id="range">
+            <option value="30">30 jours</option>
+            <option value="90" selected>90 jours</option>
+            <option value="180">180 jours</option>
+          </select>
+
+          <label for="horizon"><strong>Horizon de prévision :</strong></label>
+          <select id="horizon">
+            <option value="7">7 jours</option>
+            <option value="14">14 jours</option>
+            <option value="30" selected>30 jours</option>
+          </select>
+
+          <label><strong>Modèles :</strong></label>
+          <div class="indicators">
+            <label><input type="checkbox" id="sma" checked> SMA</label>
+            <label><input type="checkbox" id="ema" checked> EMA</label>
+            <label><input type="checkbox" id="linreg" checked> Régression linéaire</label>
+            <label><input type="checkbox" id="arima"> ARIMA (simulation)</label>
+          </div>
+
+          <label for="smaPeriod"><strong>Période SMA :</strong></label>
+          <input type="number" id="smaPeriod" min="1" value="20">
+
+          <label for="emaAlpha"><strong>Alpha EMA :</strong></label>
+          <input type="number" id="emaAlpha" step="0.01" min="0" max="1" value="0.25">
+
+          <button type="button" id="runForecast" class="btn">Lancer la prévision</button>
+        </form>
+      </div>
+
+      <!-- Carte affichage -->
+      <div class="card">
+        <h3>Affichage</h3>
+        <div class="display-toggles">
+          <label><input type="radio" name="view" value="forecast" checked> Prévisions</label>
+          <label><input type="radio" name="view" value="errors"> Erreurs (MAE / MAPE)</label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GRAPHIQUES -->
+  <section class="charts">
+    <div id="loader" style="display:none;margin-bottom:12px;padding:8px;background:#f3f4f6;border-radius:6px;color:#111;">Calcul en cours…</div>
+    <div class="card">
+      <h2>Prévisions</h2>
+      <canvas id="forecastChart" height="120"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Erreurs des modèles</h2>
+      <canvas id="errorChart" height="100"></canvas>
+    </div>
+  </section>
+
+  <!-- EXPLICATION DES MODÈLES -->
+  <section class="features">
+    <h2>Modèles utilisés</h2>
+
+    <div class="grid">
+      <div class="card">
+        <h3>SMA</h3>
+        <p>Moyenne mobile simple sur une fenêtre glissante. Idéal pour lisser les tendances.</p>
+      </div>
+
+      <div class="card">
+        <h3>EMA</h3>
+        <p>Moyenne mobile exponentielle donnant plus de poids aux données récentes.</p>
+      </div>
+
+      <div class="card">
+        <h3>Régression linéaire</h3>
+        <p>Projection basée sur la tendance générale du prix.</p>
+      </div>
+
+      <div class="card">
+        <h3>ARIMA (simulation)</h3>
+        <p>Modèle statistique avancé pour séries temporelles (version simplifiée ici).</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2025 CryptoView — Tous droits réservés</p>
+  <p><a th:href="@{/legal}">Mentions légales</a> | <a th:href="@{/privacy}">Confidentialité</a> | <a th:href="@{/support}">Support</a></p>
+</footer>
+
+</body>
+</html>

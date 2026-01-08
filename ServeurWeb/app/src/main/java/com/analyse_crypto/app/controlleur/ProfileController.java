@@ -17,6 +17,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * Contrôleur pour la gestion du profil utilisateur.
+ *
+ * Permet de consulter et modifier l'email et le mot de passe de l'utilisateur
+ * connecté via des formulaires validés côté serveur.
+ */
 @Controller()
 public class ProfileController {
 
@@ -30,6 +36,7 @@ public class ProfileController {
     private final String passwordChangeForm="PasswordChangeForm";
     private final String page="profile";
 
+    /** Formulaire de changement d'email. */
     public class EmailChangeForm {
         @NotBlank(message = "L’email est requis.")
         @Email(message = "Format d’email invalide.")
@@ -39,6 +46,7 @@ public class ProfileController {
         public void setNewEmail(String newEmail) { this.newEmail = newEmail; }
     }
 
+    /** Formulaire de changement de mot de passe. */
     public class PasswordChangeForm {
         @NotBlank(message = "L’ancien mot de passe est requis.")
         private String oldPassword;
@@ -61,6 +69,9 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Affiche la page de profil avec les formulaires de modification.
+     */
     @GetMapping("/profile")
     public String showProfile(Model model) {
         model.addAttribute(emailChangeForm, new EmailChangeForm());
@@ -70,6 +81,11 @@ public class ProfileController {
 
 
 
+    /**
+     * Traite la soumission du formulaire de changement d'email.
+     *
+     * Valide le format, vérifie l'unicité et met à jour l'entité `User`.
+     */
     @PostMapping("/profile/change-email")
     public String changeEmail(@Valid @ModelAttribute("EmailChangeForm") EmailChangeForm form,BindingResult result,Authentication authentication,Model model){
         if (result.hasErrors()) {
@@ -98,6 +114,11 @@ public class ProfileController {
         return page;
     }
 
+    /**
+     * Traite la soumission du formulaire de changement de mot de passe.
+     *
+     * Vérifie le mot de passe actuel et met à jour le mot de passe encodé.
+     */
     @PostMapping("/profile/change-password")
     public String changePassword( @Valid @ModelAttribute("PasswordChangeForm") PasswordChangeForm form,BindingResult bindingResult,Authentication authentication,Model model){
         
