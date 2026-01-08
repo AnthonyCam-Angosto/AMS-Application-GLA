@@ -23,11 +23,12 @@ jobs:
 
       - name: Tag & Push images to GHCR (prefix only)
         run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGES=$(docker images --format '{{.Repository}}:{{.Tag}}')
 
           for IMG in $IMAGES; do
             # Ajoute simplement ghcr.io/ devant le nom existant
-            NEW_NAME="ghcr.io/${{ github.repository_owner }}/${IMG}"
+            NEW_NAME="ghcr.io/${OWNER}/${IMG}"
 
             echo "Tagging $IMG as $NEW_NAME"
             docker tag "$IMG" "$NEW_NAME"
