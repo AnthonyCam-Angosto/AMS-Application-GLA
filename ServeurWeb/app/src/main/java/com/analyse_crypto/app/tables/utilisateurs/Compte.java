@@ -3,6 +3,7 @@ package com.analyse_crypto.app.tables.utilisateurs;
 import java.math.BigDecimal;
 
 import com.analyse_crypto.app.tables.data_crypto.Crypto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,10 +26,12 @@ public class Compte {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_portefeuille", nullable = false)
+    @JsonIgnore
     private Portefeuille portefeuille;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crypto_id", nullable = false)
+    @JsonIgnore
     private Crypto crypto;
 
     @Column(name = "solde", nullable = false, precision = 20, scale = 10)

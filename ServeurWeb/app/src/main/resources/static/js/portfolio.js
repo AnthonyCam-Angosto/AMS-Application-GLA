@@ -34,18 +34,28 @@ async function fetchTransactions(portfolioId) {
 
 // Ajouter une transaction
 async function addTransactionAPI(data) {
+  const csrfToken = document.querySelector('meta[name="_csrf"]').content; 
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
   await fetch("/portfolio/transaction", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", [csrfHeader]: csrfToken },
     body: JSON.stringify(data)
   });
 }
 
 // Créer un portefeuille
 async function createPortfolioAPI(data) {
+  const csrfToken = document.querySelector('meta[name="_csrf"]').content; 
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+  
   const res = await fetch("/portfolio/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      [csrfHeader]: csrfToken
+    },
     body: JSON.stringify(data)
   });
   return await res.json();
@@ -72,15 +82,17 @@ async function initSelectors() {
   const cryptoSelect = document.getElementById("cryptoSelect");
 
   portfolios.forEach(p => {
-    portfolioSelect.innerHTML += `<option value="${p.id_portefeuille}">${p.nom}</option>`;
+    portfolioSelect.innerHTML += `<option value="${p.idPortefeuille}">${p.nom}</option>`;
   });
 
   cryptos.forEach(c => {
-    cryptoSelect.innerHTML += `<option value="${c.crypto_id}">${c.nom}</option>`;
+    cryptoSelect.innerHTML += `<option value="${c}">${c}</option>`;
   });
-
-  currentPortfolio = portfolios[0].id_portefeuille;
-  portfolioSelect.value = currentPortfolio;
+  if(portfolios.length > 0){
+    currentPortfolio = portfolios[0].idPortefeuille;
+    portfolioSelect.value = currentPortfolio;
+    console.log("Initial portfolio set to ID:", currentPortfolio);
+  }
 
   portfolioSelect.addEventListener("change", async () => {
     currentPortfolio = portfolioSelect.value;
@@ -90,6 +102,7 @@ async function initSelectors() {
 
 // Rafraîchit toutes les données
 async function refreshPortfolio() {
+  if (!currentPortfolio) return;
   accounts = await fetchAccounts(currentPortfolio);
   transactions = await fetchTransactions(currentPortfolio);
 
@@ -107,6 +120,57 @@ function initCreatePortfolioPopup() {
   openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
   closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
 }
+
+async function createPortfolio() {
+  const nameInput = document.getElementById("newPortfolioName");
+  const cryptoSelect = document.getElementById("newPortfolioCrypto");
+  const modal = document.getElementById("createPortfolioModal");
+
+  const name = nameInput.value.trim();
+  const cryptoId = cryptoSelect.value;
+
+  if (!name) {
+    alert("Veuillez entrer un nom de portefeuille");
+    return;
+  }
+
+  if (!cryptoId) {
+    alert("Veuillez sélectionner une crypto initiale");
+    return;
+  }
+
+  // Appel API
+  const result = await createPortfolioAPI({
+    nom: name,
+    crypto_id: cryptoId
+  });
+
+  if (!result || !result.id_portefeuille) {
+    alert("Erreur lors de la création du portefeuille");
+    return;
+  }
+
+  // Mettre à jour la liste des portefeuilles
+  const portfolioSelect = document.getElementById("portfolioSelect");
+  portfolioSelect.innerHTML += `
+    <option value="${result.id_portefeuille}">${name}</option>
+  `;
+
+  // Sélectionner automatiquement le nouveau portefeuille
+  currentPortfolio = result.id_portefeuille;
+  portfolioSelect.value = currentPortfolio;
+
+  // Rafraîchir les données
+  await refreshPortfolio();
+
+  // Fermer la popup
+  modal.classList.add("hidden");
+
+  // Reset du formulaire
+  nameInput.value = "";
+  cryptoSelect.value = "";
+}
+
 
 
 // ===============================
@@ -168,7 +232,7 @@ function updatePortfolioChart() {
   portfolioChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: transactions.map(t => new Date(t.date_transaction)),
+      labels: transactions.map(t => new Date(t.dateTransaction).toLocaleString("fr-FR", {timeZone: "Europe/Paris",hour12: false})),
       datasets: [{
         label: "Transactions",
         data: transactions.map(t => t.montant),
@@ -217,7 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cryptoSelectPopup = document.getElementById("newPortfolioCrypto");
   cryptos = await fetchCryptos();
   cryptos.forEach(c => {
-    cryptoSelectPopup.innerHTML += `<option value="${c.crypto_id}">${c.nom}</option>`;
+    cryptoSelectPopup.innerHTML += `<option value="${c}">${c}</option>`;
   });
 
   document.getElementById("createPortfolioBtn").addEventListener("click", createPortfolio);

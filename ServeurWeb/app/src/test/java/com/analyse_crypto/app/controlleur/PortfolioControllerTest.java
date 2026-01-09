@@ -74,7 +74,7 @@ class PortfolioControllerTest {
     @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetComptesOk() throws Exception {
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
-        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(1), any())).thenReturn(p);
+        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(p);
 
         Compte c = new Compte();
         c.setSolde(BigDecimal.TEN);
@@ -89,7 +89,7 @@ class PortfolioControllerTest {
     @Test
     @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetComptesNotFound() throws Exception {
-        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(1), any())).thenReturn(null);
+        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(null);
 
         mockMvc.perform(get("/portfolio/1/comptes")
                         .principal(() -> "test"))
@@ -101,7 +101,7 @@ class PortfolioControllerTest {
     @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetTransactions() throws Exception {
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
-        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(1), any())).thenReturn(p);
+        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(p);
 
         Compte c = new Compte();
         Mockito.when(compteRepository.findByPortefeuille(p)).thenReturn(List.of(c));
@@ -121,13 +121,13 @@ class PortfolioControllerTest {
     void testAddTransaction() throws Exception {
         PortfolioController.TransactionRequest req = new PortfolioController.TransactionRequest();
 
-        req.setId_portefeuille(1);
+        req.setId_portefeuille(Long.valueOf(1));
         req.setCrypto_id("BTC");
         req.setType("ENTREE");
         req.setMontant(BigDecimal.valueOf(100));
 
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
-        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(1), any())).thenReturn(p);
+        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(p);
 
         Compte c = new Compte();
         Mockito.when(compteRepository.findByPortefeuilleAndCrypto_Symbole(p, "BTC")).thenReturn(c);
@@ -144,9 +144,9 @@ class PortfolioControllerTest {
     @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testAddTransactionPortfolioNotFound() throws Exception {
         PortfolioController.TransactionRequest req = new PortfolioController.TransactionRequest();
-        req.setId_portefeuille(1);
+        req.setId_portefeuille(Long.valueOf(1));
 
-        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(1), any())).thenReturn(null);
+        Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(null);
 
         mockMvc.perform(post("/portfolio/transaction")
                         .with(csrf())

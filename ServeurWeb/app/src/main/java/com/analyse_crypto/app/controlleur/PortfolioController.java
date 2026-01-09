@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import com.analyse_crypto.app.tables.utilisateurs.User;
 import com.analyse_crypto.app.tables.utilisateurs.repository.CompteRepository;
 import com.analyse_crypto.app.tables.utilisateurs.repository.PortefeuilleRepository;
 import com.analyse_crypto.app.tables.utilisateurs.repository.TransactionRepository;
+import com.analyse_crypto.app.config.CustomUserDetails;
 import com.analyse_crypto.app.tables.TypeTransac;
 import com.analyse_crypto.app.tables.data_crypto.Crypto;
 
@@ -44,18 +46,17 @@ public class PortfolioController {
     @Autowired
     CryptoRepository cryptoRepository;
 
-
     public static class TransactionRequest {
-        private Integer id_portefeuille;
+        private Long id_portefeuille;
         private String crypto_id;
         private String type; // ENTREE ou SORTIE
         private BigDecimal montant;
 
-        public Integer getId_portefeuille() {
+        public Long getId_portefeuille() {
             return id_portefeuille;
         }
 
-        public void setId_portefeuille(Integer id_portefeuille) {
+        public void setId_portefeuille(Long id_portefeuille) {
             this.id_portefeuille = id_portefeuille;
         }
 
@@ -112,13 +113,14 @@ public class PortfolioController {
    
     @GetMapping("/list")
     @ResponseBody
-    public List<Portefeuille> listPortfolios(@AuthenticationPrincipal User user) {
-        return portefeuilleRepository.findByUser(user);
+    public List<Portefeuille> listPortfolios(@AuthenticationPrincipal CustomUserDetails principal) {
+        System.out.println("Fetching portfolios for user: " + principal.getUsername()+" with ID: "+principal.getUser().getUserId());
+        return portefeuilleRepository.findByUser(principal.getUser());
     }
 
     @GetMapping("/{id}/comptes")
-    public ResponseEntity<?> getComptes(@PathVariable int id,@AuthenticationPrincipal User user) {
-        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(id, user);
+    public ResponseEntity<?> getComptes(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails principal) {
+        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(id, principal.getUser());
         if (portefeuille == null) {
             return ResponseEntity.status(404).body("Portefeuille non trouvé");
         }
@@ -128,8 +130,8 @@ public class PortfolioController {
 
 
     @GetMapping("/{id}/transactions")
-    public ResponseEntity<?> getTransactions(@PathVariable int id,@AuthenticationPrincipal User user) {
-        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(id, user);
+    public ResponseEntity<?> getTransactions(@PathVariable Long id,@AuthenticationPrincipal CustomUserDetails principal) {
+        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(id, principal.getUser());
         if (portefeuille == null) {
             return ResponseEntity.status(404).body("Portefeuille non trouvé");
         }
@@ -141,8 +143,8 @@ public class PortfolioController {
 
 
     @PostMapping("/transaction")
-    public ResponseEntity<?> addTransaction(@RequestBody TransactionRequest req,@AuthenticationPrincipal User user) {
-        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(req.getId_portefeuille(), user);
+    public ResponseEntity<?> addTransaction(@RequestBody TransactionRequest req,@AuthenticationPrincipal CustomUserDetails principal) {
+        Portefeuille portefeuille = portefeuilleRepository.findByIdPortefeuilleAndUser(req.getId_portefeuille(), principal.getUser());
         if (portefeuille == null) {
             return ResponseEntity.status(404).body(null);
         }
@@ -154,13 +156,15 @@ public class PortfolioController {
         transaction.setType(TypeTransac.valueOf(req.getType()));
         transaction.setMontant(req.getMontant());
         transaction.setDateTransaction(LocalDateTime.now());
+        transactionService.save(transaction);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(transaction);
     }
 
     @PostMapping("/create")
     @ResponseBody
-    public Portefeuille createPortfolio(@RequestBody CreatePortfolioRequest req,@AuthenticationPrincipal User user) {
+    public Portefeuille createPortfolio(@RequestBody CreatePortfolioRequest req,@AuthenticationPrincipal CustomUserDetails principal) {
+        User user = principal.getUser();
         Portefeuille p =new Portefeuille(user, req.getNom(),LocalDateTime.now());
         portefeuilleRepository.save(p);
 

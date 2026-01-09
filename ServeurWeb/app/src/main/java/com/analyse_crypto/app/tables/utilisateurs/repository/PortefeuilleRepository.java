@@ -9,5 +9,5 @@ import com.analyse_crypto.app.tables.utilisateurs.User;
 
 public interface PortefeuilleRepository extends JpaRepository<Portefeuille, Long> {
     List<Portefeuille> findByUser(User user);
-    Portefeuille findByIdPortefeuilleAndUser(int id, User user);
+    Portefeuille findByIdPortefeuilleAndUser(Long id, User user);
 }

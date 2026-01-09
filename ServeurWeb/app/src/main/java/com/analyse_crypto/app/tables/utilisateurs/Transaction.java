@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.analyse_crypto.app.tables.TypeTransac;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +34,7 @@ public class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_compte", nullable = false)
+    @JsonIgnore
     private Compte compte;
 
     @Enumerated(EnumType.STRING)
