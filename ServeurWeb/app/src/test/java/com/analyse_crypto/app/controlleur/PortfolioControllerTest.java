@@ -1,5 +1,7 @@
 package com.analyse_crypto.app.controlleur;
 
+import com.analyse_crypto.app.config.CustomUserDetails;
+import com.analyse_crypto.app.tables.RoleUser;
 import com.analyse_crypto.app.tables.data_crypto.Crypto;
 import com.analyse_crypto.app.tables.data_crypto.repository.CryptoRepository;
 import com.analyse_crypto.app.tables.utilisateurs.Compte;
@@ -11,13 +13,16 @@ import com.analyse_crypto.app.tables.utilisateurs.repository.PortefeuilleReposit
 import com.analyse_crypto.app.tables.utilisateurs.repository.TransactionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import org.springframework.security.core.Authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,11 +61,26 @@ class PortfolioControllerTest {
         User u = new User();
         u.setIdentifiant("test");
         u.setEmail("test@google.com");
+        u.setRole(RoleUser.UTILISATEUR);
         return u;
     }
 
+    @BeforeEach
+    void setup() {
+        User user = fakeUser();
+        CustomUserDetails cud = new CustomUserDetails(user);
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+            cud,
+            null,
+            cud.getAuthorities()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testListPortfolios() throws Exception {
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
         Mockito.when(portefeuilleRepository.findByUser(any())).thenReturn(List.of(p));
@@ -71,7 +92,6 @@ class PortfolioControllerTest {
     }
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetComptesOk() throws Exception {
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
         Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(p);
@@ -87,7 +107,6 @@ class PortfolioControllerTest {
     }
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetComptesNotFound() throws Exception {
         Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(null);
 
@@ -98,7 +117,6 @@ class PortfolioControllerTest {
 
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testGetTransactions() throws Exception {
         Portefeuille p = new Portefeuille(fakeUser(), "Test", LocalDateTime.now());
         Mockito.when(portefeuilleRepository.findByIdPortefeuilleAndUser(eq(Long.valueOf(1)), any())).thenReturn(p);
@@ -117,7 +135,6 @@ class PortfolioControllerTest {
     }
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testAddTransaction() throws Exception {
         PortfolioController.TransactionRequest req = new PortfolioController.TransactionRequest();
 
@@ -141,7 +158,6 @@ class PortfolioControllerTest {
     }
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testAddTransactionPortfolioNotFound() throws Exception {
         PortfolioController.TransactionRequest req = new PortfolioController.TransactionRequest();
         req.setId_portefeuille(Long.valueOf(1));
@@ -158,7 +174,6 @@ class PortfolioControllerTest {
 
 
     @Test
-    @WithMockUser(username="user", roles={"UTILISATEUR"})
     void testCreatePortfolio() throws Exception {
         PortfolioController.CreatePortfolioRequest req = new PortfolioController.CreatePortfolioRequest();
         req.setNom("MonPortefeuille");
