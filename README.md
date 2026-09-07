@@ -114,9 +114,3 @@ Consulter les routes dans le code source `ServeurWeb/src/main` pour la liste com
 ### Dépannage courant
 - Pas de données : vérifier que les workers FetchAPI sont démarrés et que la base PostgreSQL est accessible.
 - Erreurs d'authentification : vérifier les variables d'environnement et la configuration du provider d'auth (JWT/SMTP).
-
----
-
-Si vous souhaitez, je peux :
-- Ajouter des exemples d'appels API détaillés (cURL) pour chaque endpoint.
-- Documenter le schéma de la base de données dans un fichier séparé.
